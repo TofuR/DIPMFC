@@ -4,7 +4,7 @@
 #include <fstream>
 
 
-CDib::CDib(void) :m_pDibBits(NULL), m_pGrayValueCount(NULL)
+CDib::CDib(void) :m_pDibBits(NULL), m_pGrayValueCount(NULL), m_pRawBuffer(NULL)
 {
 	// initialized variables
 	m_nBitCount = 0;
@@ -14,7 +14,7 @@ CDib::CDib(void) :m_pDibBits(NULL), m_pGrayValueCount(NULL)
 
 }
 
-CDib::CDib(CDib& Dib) :m_pDibBits(NULL), m_pGrayValueCount(NULL)
+CDib::CDib(CDib& Dib) :m_pDibBits(NULL), m_pGrayValueCount(NULL), m_pRawBuffer(NULL)
 {
 	// initialized variables
 	m_nBitCount = 0;
@@ -54,6 +54,12 @@ CDib::CDib(CDib& Dib) :m_pDibBits(NULL), m_pGrayValueCount(NULL)
 CDib::~CDib(void)
 {
 	m_pDibBits = NULL;
+
+	if (m_pRawBuffer != NULL)
+	{
+		delete[] m_pRawBuffer;
+		m_pRawBuffer = NULL;
+	}
 	if (m_pGrayValueCount != NULL)
 	{
 		delete[]m_pGrayValueCount;
@@ -63,64 +69,135 @@ CDib::~CDib(void)
 
 void CDib::LoadFile(LPCTSTR lpszPathName)
 {
-	Load(lpszPathName);
-	m_nWidth = GetWidth();
-	m_nHeight = GetHeight();
-	m_nWidthBytes = abs(GetPitch());
-	m_nBitCount = GetBPP();
-	m_pDibBits = (unsigned char*)GetBits() + (m_nHeight - 1) * GetPitch();
-}
-
-void CDib::LoadRawFile(LPCTSTR lpszPathName, int nWidth, int nHeight, int nBitCount)
-{
-	if (nWidth <= 0 || nHeight <= 0 || nBitCount <= 0)
+	//检查文件名
+	CString strPathName(lpszPathName);
+	int nDotIndex = strPathName.ReverseFind(_T('.'));
+	if (nDotIndex == -1)
 	{
+		//文件名没有找到"."
+		AfxMessageBox(_T("不支持的文件格式"));
 		return;
 	}
 
-	std::vector<uint16_t> buffer(nWidth * nHeight);
-	std::ifstream file(lpszPathName, std::ios::binary);
-	file.read(reinterpret_cast<char*>(buffer.data()), buffer.size() * sizeof(uint16_t));
-	Create(nWidth, nHeight, 8);
-	HBITMAP hBitmap = (HBITMAP)Detach();
-	RGBQUAD palette[256];
-	for (int i = 0; i < 256; ++i)
+	CString strExtension = strPathName.Mid(nDotIndex + 1);//取出文件名"."以后的内容
+	strExtension.MakeLower();//将扩展名转换为小写
+	if (strExtension == _T("raw"))
 	{
-		palette[i].rgbBlue = palette[i].rgbGreen = palette[i].rgbRed = palette[i].rgbReserved = (BYTE)i;
+		LoadRawFile(lpszPathName);
 	}
-	HDC hDC = ::GetDC(NULL);
-	HDC hMemDC = ::CreateCompatibleDC(hDC);
-	::ReleaseDC(NULL, hDC);
-	HBITMAP hOldBitmap = (HBITMAP)::SelectObject(hMemDC, hBitmap);
-	SetDIBColorTable(hMemDC, 0, 256, palette);
-	::SelectObject(hMemDC, hOldBitmap);
-	::DeleteDC(hMemDC);
-	Attach(hBitmap);
+	else
+	{
+		Load(lpszPathName);
+		m_nWidth = GetWidth();
+		m_nHeight = GetHeight();
+		m_nWidthBytes = abs(GetPitch());
+		m_nBitCount = GetBPP();
+		m_pDibBits = (unsigned char*)GetBits() + (m_nHeight - 1) * GetPitch();
+	}
+}
 
+void CDib::LoadRawFile(LPCTSTR lpszPathName)
+{
+	m_nWidth = 512;
+	m_nHeight = 512;
+
+	//创建暂存文件像素值的缓冲区//16位，保存raw
+	if (m_pRawBuffer != NULL)
+	{
+		delete[] m_pRawBuffer;
+		m_pRawBuffer = NULL;
+	}
+	m_pRawBuffer = new uint16_t[m_nWidth * m_nHeight];
+	memset(m_pRawBuffer, 0, m_nWidth * m_nHeight * sizeof(uint16_t));
+
+	//使用fistream读取raw文件的像素值进buffer
+	std::ifstream file(lpszPathName, std::ios::binary);
+	file.read(reinterpret_cast<char*>(m_pRawBuffer), m_nWidth * m_nHeight * sizeof(uint16_t));
+
+	//文件打开失败弹出警告，然后退出
+	if (file.fail()) {
+		AfxMessageBox(_T("读取文件失败"));
+		return;
+	}
+	file.close();
+	//因为读取进来的像素高8位和低8位顺序是反的，这里对像素高低8位进行对调，同时获取最大值
+	for (int i = 0; i < m_nWidth * m_nHeight; i++) {
+		m_pRawBuffer[i] = ((m_pRawBuffer[i] & 0xff00) >> 8) | ((m_pRawBuffer[i] & 0x00ff) << 8);
+	}
+	CreateDisplayDib(m_pRawBuffer, m_nWidth, m_nHeight, 8);
+}
+
+void CDib::CreateDisplayDib(uint16_t* pRawBuffer, int nWidth, int nHeight, int nBitCount)
+{
+	//Create new Dib
+	Create(nWidth, nHeight, 8, 0);
+	if (IsIndexed())
+	{
+		int nColors = GetMaxColorTableEntries();
+		if (nColors > 0)
+		{
+			RGBQUAD* pal = new RGBQUAD[nColors];
+			for (int i = 0; i < nColors; i++)
+			{
+				pal[i].rgbBlue = i;
+				pal[i].rgbGreen = i;
+				pal[i].rgbRed = i;
+			}
+			SetColorTable(0, nColors, pal);
+			delete[] pal;
+		}
+	}
 	m_nWidth = GetWidth();
 	m_nHeight = GetHeight();
 	m_nWidthBytes = abs(GetPitch());
 	m_nBitCount = GetBPP();
 	m_pDibBits = (unsigned char*)GetBits() + (m_nHeight - 1) * GetPitch();
-
-	uint16_t max = 0;
-	for (int i = 0; i < buffer.size(); i++)
-	{
-		buffer[i] = ((buffer[i] & 0xff00) >> 8) | ((buffer[i] & 0x00ff) << 8);
-
-		if (buffer[i] > max)
-		{
-			max = buffer[i];
-		}
-	}
+	//将buffer中的像素值写入Dib
 	for (int i = 0; i < m_nHeight; i++)
 	{
 		for (int j = 0; j < m_nWidth; j++)
 		{
-			uint16_t temp = buffer[i * m_nWidth + j];
-			uint8_t gray = static_cast<uint8_t>(temp * 255.0 / max);
-			int invertedY = m_nWidth - 1 - i;
-			*(m_pDibBits + invertedY * m_nWidthBytes + j) = gray;
+			*(m_pDibBits + i * m_nWidthBytes + j) = (BYTE)(pRawBuffer[i * m_nWidth + j] >> 4);
+		}
+	}
+}
+
+void CDib::CreateWhiteRect(int nWidth, int nHeight, int wWidth, int wHeight)
+{
+	Create(nWidth, nHeight, 8, 0);
+	if (IsIndexed())
+	{
+		int nColors = GetMaxColorTableEntries();
+		if (nColors > 0)
+		{
+			RGBQUAD* pal = new RGBQUAD[nColors];
+			for (int i = 0; i < nColors; i++)
+			{
+				pal[i].rgbBlue = i;
+				pal[i].rgbGreen = i;
+				pal[i].rgbRed = i;
+			}
+			SetColorTable(0, nColors, pal);
+			delete[] pal;
+		}
+	}
+	m_nWidth = GetWidth();
+	m_nHeight = GetHeight();
+	m_nWidthBytes = abs(GetPitch());
+	m_nBitCount = GetBPP();
+	m_pDibBits = (unsigned char*)GetBits() + (m_nHeight - 1) * GetPitch();
+	for (int i = 0; i < m_nHeight; i++)
+	{
+		for (int j = 0; j < m_nWidth; j++)
+		{
+			if (j > (m_nWidth - wWidth) / 2 && j < (m_nWidth + wWidth) / 2 && i >(m_nHeight - wHeight) / 2 && i < (m_nHeight + wHeight) / 2)
+			{
+				*(m_pDibBits + i * m_nWidthBytes + j) = 255;
+			}
+			else
+			{
+				*(m_pDibBits + i * m_nWidthBytes + j) = 0;
+			}
 		}
 	}
 }
@@ -385,7 +462,7 @@ void CDib::vector2uchar(vector<vector<double>> const& pDibBits2D)
 	}
 }
 
-void CDib::Window_1(double midpoint, double width)
+void CDib::Window_1(double level, double width)
 {
 	if (m_pDibBits == NULL)
 	{
@@ -400,7 +477,7 @@ void CDib::Window_1(double midpoint, double width)
 	GetColorTable(0, nColors, pColorTable);
 	for (int i = 0; i < nColors; i++)
 	{
-		int gray = 255 * ((i - midpoint) / width + 0.5);
+		int gray = 255 * ((i - level) / width + 0.5);
 		if (gray < 0)
 		{
 			gray = 0;

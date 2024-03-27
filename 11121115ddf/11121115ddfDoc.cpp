@@ -41,6 +41,7 @@ BEGIN_MESSAGE_MAP(CMy11121115ddfDoc, CDocument)
 	ON_COMMAND(ID_BONE, &CMy11121115ddfDoc::OnCTBone)
 	ON_COMMAND(ID_LUNG, &CMy11121115ddfDoc::OnCTLung)
 	ON_COMMAND(ID_ADJUSTWINDOW, &CMy11121115ddfDoc::OnAdjustwindow)
+	ON_COMMAND(ID_WhiteRect, &CMy11121115ddfDoc::OnWhiterect)
 END_MESSAGE_MAP()
 
 
@@ -172,31 +173,12 @@ BOOL CMy11121115ddfDoc::OnOpenDocument(LPCTSTR lpszPathName)
 
 	// TODO:  在此添加您专用的创建代码
 	// 获取文件格式
-	CString strPathName = lpszPathName;
-	int nPos = strPathName.ReverseFind('.');
-	CString strFormat = strPathName.Mid(nPos + 1);
-	strFormat.MakeLower();
-
 	if (m_pDib != NULL)
 	{
 		delete m_pDib;
 	}
 	m_pDib = new CDib;
-
-	if (strFormat == "bmp")
-	{
-		m_pDib->LoadFile(lpszPathName);
-	}
-	else if (strFormat == "raw")
-	{
-		m_pDib->LoadRawFile(lpszPathName, 512, 512, 16);
-	}
-	else
-	{
-		AfxMessageBox(_T("不支持的文件格式"));
-		return FALSE;
-	}
-
+	m_pDib->LoadFile(lpszPathName);
 	if (m_pBuffer != NULL)
 	{
 		delete m_pBuffer;
@@ -384,4 +366,22 @@ void CMy11121115ddfDoc::OnAdjustwindow()
 			UpdateAllViews(NULL);
 		}
 	}
+}
+
+
+void CMy11121115ddfDoc::OnWhiterect()
+{
+	// TODO: 在此添加命令处理程序代码
+	if (m_pDib != NULL)
+	{
+		delete m_pDib;
+	}
+	m_pDib = new CDib;
+	m_pDib->CreateWhiteRect(512, 512, 50, 100);
+	if (m_pBuffer != NULL)
+	{
+		delete m_pBuffer;
+	}
+	m_pBuffer = new CDib(*m_pDib);
+	UpdateAllViews(NULL);
 }

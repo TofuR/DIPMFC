@@ -25,7 +25,9 @@ public:
 public:
 	void LoadFile(LPCTSTR lpszPathName);
 	//read raw picture
-	void LoadRawFile(LPCTSTR lpszPathName, int nWidth, int nHeight, int nBitCount);
+	void LoadRawFile(LPCTSTR lpszPathName);
+	void CreateDisplayDib(uint16_t* pRawBuffer, int nWidth, int nHeight, int nBitCount);
+	void CreateWhiteRect(int = 512, int = 512, int = 100, int = 100);
 
 public:
 	void Stretching();
@@ -38,11 +40,10 @@ public:
 	void Laplace();
 	void Gaussian1D(int = 19);	// 一维可分离卷积核卷积高斯滤波
 	void Gaussian2D(int = 19);	// 二维高斯滤波
-	//显示肺部CT图像骨窗
-	void BoneWindow(double = 140, double = 70);
+	void BoneWindow(double = 140, double = 70);	//显示肺部CT图像骨窗
+	void LungWindow(double = 64, double = 92);	//显示肺部CT图像肺窗
+	// 在图像中央创建一个中间白色的矩形8位灰度图像
 
-	//显示肺部CT图像肺窗
-	void LungWindow(double = 64, double = 92);
 
 
 public:
@@ -69,7 +70,7 @@ private:
 	unsigned char* m_pDibBits;	// 指向位图数据的指针
 
 private:
-	uint16_t* m_pRaw;
+	uint16_t* m_pRawBuffer;
 
 private:
 	long* m_pGrayValueCount;
