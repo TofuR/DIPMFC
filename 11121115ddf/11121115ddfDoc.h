@@ -67,4 +67,6 @@ public:
 	afx_msg void OnCTLung();
 	afx_msg void OnAdjustwindow();
 	afx_msg void OnWhiterect();
+	afx_msg void OnAmplitude();
+	afx_msg void OnPhase();
 };

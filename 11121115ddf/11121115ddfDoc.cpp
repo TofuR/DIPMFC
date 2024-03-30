@@ -42,6 +42,8 @@ BEGIN_MESSAGE_MAP(CMy11121115ddfDoc, CDocument)
 	ON_COMMAND(ID_LUNG, &CMy11121115ddfDoc::OnCTLung)
 	ON_COMMAND(ID_ADJUSTWINDOW, &CMy11121115ddfDoc::OnAdjustwindow)
 	ON_COMMAND(ID_WhiteRect, &CMy11121115ddfDoc::OnWhiterect)
+	ON_COMMAND(ID_Amplitude, &CMy11121115ddfDoc::OnAmplitude)
+	ON_COMMAND(ID_Phase, &CMy11121115ddfDoc::OnPhase)
 END_MESSAGE_MAP()
 
 
@@ -384,4 +386,26 @@ void CMy11121115ddfDoc::OnWhiterect()
 	}
 	m_pBuffer = new CDib(*m_pDib);
 	UpdateAllViews(NULL);
+}
+
+
+void CMy11121115ddfDoc::OnAmplitude()
+{
+	// TODO: 在此添加命令处理程序代码
+	if (m_pDib != NULL)
+	{
+		m_pDib->Amplitude();
+		UpdateAllViews(NULL);
+	}
+}
+
+
+void CMy11121115ddfDoc::OnPhase()
+{
+	// TODO: 在此添加命令处理程序代码
+	if (m_pDib != NULL)
+	{
+		m_pDib->Phase();
+		UpdateAllViews(NULL);
+	}
 }

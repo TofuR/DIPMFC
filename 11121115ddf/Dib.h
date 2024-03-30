@@ -27,7 +27,7 @@ public:
 	//read raw picture
 	void LoadRawFile(LPCTSTR lpszPathName);
 	void CreateDisplayDib(uint16_t* pRawBuffer, int nWidth, int nHeight, int nBitCount);
-	void CreateWhiteRect(int = 512, int = 512, int = 100, int = 100);
+	void CreateWhiteRect(double = 512, double = 512, double = 100, double = 100);
 
 public:
 	void Stretching();
@@ -42,15 +42,17 @@ public:
 	void Gaussian2D(int = 19);	// 二维高斯滤波
 	void BoneWindow(double = 140, double = 70);	//显示肺部CT图像骨窗
 	void LungWindow(double = 64, double = 92);	//显示肺部CT图像肺窗
-	// 在图像中央创建一个中间白色的矩形8位灰度图像
 
-
+public:
+	void Amplitude();
+	void Phase();
 
 public:
 	long* GrayValueCount();	// 获取灰度值统计
 	//unsigned char* Padding(int, int);
 	vector<vector<double>> Padding(int, int);	// 填充
 	vector<vector<double>> Conv2d(vector<vector<double>> const&, int = 1, int = 0, int = 0);	// 2D卷积
+	vector<vector<double>> Read_from_pDibBits();	// 将m_pDibBits读取到vector<vector<double>>
 	void Read_from_vector(vector<vector<unsigned char>> const&);	// 将vector<vector<unsigned char>>读取到m_pDibBits
 	void Read_from_vector(vector<vector<double>> const&);	// 将vector<vector<double>>读取到m_pDibBits
 	void Window_1(double = 127.5, double = 255);
