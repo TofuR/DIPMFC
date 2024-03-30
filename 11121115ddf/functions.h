@@ -21,3 +21,4 @@ vector<complex<double>> IFFT_1D(vector<complex<double>> const& CFData);
 vector<vector<complex<double>>> FFT_2D(vector<vector<complex<double>>> const& CTData);
 
 vector<vector<complex<double>>> IFFT_2D(vector<vector<complex<double>>> const& CFData);
+

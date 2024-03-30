@@ -52,9 +52,9 @@ public:
 	//unsigned char* Padding(int, int);
 	vector<vector<double>> Padding(int, int);	// 填充
 	vector<vector<double>> Conv2d(vector<vector<double>> const&, int = 1, int = 0, int = 0);	// 2D卷积
-	vector<vector<double>> Read_from_pDibBits();	// 将m_pDibBits读取到vector<vector<double>>
-	void Read_from_vector(vector<vector<unsigned char>> const&);	// 将vector<vector<unsigned char>>读取到m_pDibBits
-	void Read_from_vector(vector<vector<double>> const&);	// 将vector<vector<double>>读取到m_pDibBits
+	vector<vector<double>> Tovector();	// 将m_pDibBits读取到vector<vector<double>>
+	void Read(vector<vector<unsigned char>> const&);	// 将vector<vector<unsigned char>>读取到m_pDibBits
+	void Read(vector<vector<double>> const&);	// 将vector<vector<double>>读取到m_pDibBits
 	void Window_1(double = 127.5, double = 255);
 
 public:

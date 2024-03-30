@@ -9,6 +9,7 @@
 #include "functions.h"
 
 
+// CDib
 CDib::CDib(void)
 	: m_pDibBits(NULL), m_pGrayValueCount(NULL), m_pRawBuffer(NULL) {
 	// initialized variables
@@ -64,6 +65,8 @@ CDib::~CDib(void) {
 	}
 }
 
+
+// load file and create
 void CDib::LoadFile(LPCTSTR lpszPathName) {
 	// 检查文件名
 	CString strPathName(lpszPathName);
@@ -185,6 +188,9 @@ void CDib::CreateWhiteRect(double nWidth, double nHeight, double wWidth, double 
 	}
 }
 
+
+// Image Processing in Spatial Domain
+
 void CDib::Stretching() {
 	for (int i = 0; i < m_nHeight; i++) {
 		for (int j = 0; j < m_nWidthBytes; j++) {
@@ -268,7 +274,7 @@ void CDib::Smoothing() {
 	vector<vector<double>> Smoth_Kernel =
 		vector<vector<double>>(3, vector<double>(3, 1.0 / 9));
 	vector<vector<double>> pDibBits2D = Conv2d(Smoth_Kernel, 1, 1, 1);
-	Read_from_vector(pDibBits2D);
+	Read(pDibBits2D);
 }
 
 void CDib::Sobel() {
@@ -284,7 +290,7 @@ void CDib::Sobel() {
 				pDibBits2D_Y[i][j] * pDibBits2D_Y[i][j]);
 		}
 	}
-	Read_from_vector(pDibBits2D);
+	Read(pDibBits2D);
 }
 
 void CDib::Laplace() {
@@ -292,7 +298,7 @@ void CDib::Laplace() {
 		vector<vector<double>>(3, vector<double>(3, -1));
 	Laplace_Kernel[1][1] = 8;
 	vector<vector<double>> pDibBits2D = Conv2d(Laplace_Kernel, 1, 1, 1);
-	Read_from_vector(pDibBits2D);
+	Read(pDibBits2D);
 }
 
 void CDib::Gaussian1D(int kernel_size) {
@@ -319,10 +325,10 @@ void CDib::Gaussian1D(int kernel_size) {
 	}
 	vector<vector<double>> pDibBits2D_X =
 		Conv2d(Gaussian_Kernel_X, 1, 0, kernel_size / 2);
-	Read_from_vector(pDibBits2D_X);
+	Read(pDibBits2D_X);
 	vector<vector<double>> pDibBits2D_Y =
 		Conv2d(Gaussian_Kernel_Y, 1, kernel_size / 2, 0);
-	Read_from_vector(pDibBits2D_Y);
+	Read(pDibBits2D_Y);
 }
 
 void CDib::Gaussian2D(int kernel_size) {
@@ -347,7 +353,7 @@ void CDib::Gaussian2D(int kernel_size) {
 	}
 	vector<vector<double>> pDibBits2D =
 		Conv2d(Gaussian_Kernel, 1, kernel_size / 2, kernel_size / 2);
-	Read_from_vector(pDibBits2D);
+	Read(pDibBits2D);
 }
 
 void CDib::BoneWindow(double midpoint, double width) {
@@ -358,9 +364,12 @@ void CDib::LungWindow(double midpoint, double width) {
 	Window_1(midpoint, width);
 }
 
+
+// Image Processing in Frequency Domain
+
 void CDib::Amplitude()
 {
-	vector<vector<double>> pDibBits2D = Read_from_pDibBits();
+	vector<vector<double>> pDibBits2D = Tovector();
 	vector<vector<complex<double>>> CTData = Double2Complex(pDibBits2D);
 	vector<vector<complex<double>>> CFData = ::FFT(CTData);
 	// 计算幅度谱
@@ -377,7 +386,7 @@ void CDib::Amplitude()
 		}
 	}
 	vector<vector<double>> pDibBits2D_Amplitude = Complex2Double(CFData);
-	Read_from_vector(pDibBits2D_Amplitude);
+	Read(pDibBits2D_Amplitude);
 
 	//unsigned char* pDIBBits = m_pDibBits;
 	//long nWidth = m_nWidth;
@@ -457,7 +466,7 @@ void CDib::Amplitude()
 
 void CDib::Phase()
 {
-	vector<vector<double>> pDibBits2D = Read_from_pDibBits();
+	vector<vector<double>> pDibBits2D = Tovector();
 	vector<vector<complex<double>>> CTData = Double2Complex(pDibBits2D);
 	vector<vector<complex<double>>> CFData = ::FFT(CTData);
 	// 计算图像的相位谱
@@ -474,8 +483,11 @@ void CDib::Phase()
 		}
 	}
 	vector<vector<double>> pDibBits2D_Phase = Complex2Double(CFData);
-	Read_from_vector(pDibBits2D_Phase);
+	Read(pDibBits2D_Phase);
 }
+
+
+// some functions
 
 long* CDib::GrayValueCount() {
 	long nColors = GetMaxColorTableEntries();
@@ -522,7 +534,7 @@ vector<vector<double>> CDib::Conv2d(vector<vector<double>> const& kernel,
 	return pDibBits2D;
 }
 
-vector<vector<double>> CDib::Read_from_pDibBits()
+vector<vector<double>> CDib::Tovector()
 {
 	vector<vector<double>> pDibBits2D(m_nHeight, vector<double>(m_nWidthBytes, 0));
 	for (int i = 0; i < m_nHeight; i++) {
@@ -533,7 +545,7 @@ vector<vector<double>> CDib::Read_from_pDibBits()
 	return pDibBits2D;
 }
 
-void CDib::Read_from_vector(vector<vector<unsigned char>> const& pDibBits2D) {
+void CDib::Read(vector<vector<unsigned char>> const& pDibBits2D) {
 	for (int i = 0; i < m_nHeight; i++) {
 		for (int j = 0; j < m_nWidthBytes; j++) {
 			*(m_pDibBits + i * m_nWidthBytes + j) = pDibBits2D[i][j];
@@ -541,7 +553,7 @@ void CDib::Read_from_vector(vector<vector<unsigned char>> const& pDibBits2D) {
 	}
 }
 
-void CDib::Read_from_vector(vector<vector<double>> const& pDibBits2D) {
+void CDib::Read(vector<vector<double>> const& pDibBits2D) {
 	for (int i = 0; i < m_nHeight; i++) {
 		for (int j = 0; j < m_nWidthBytes; j++) {
 			double tmp = pDibBits2D[i][j];
@@ -580,6 +592,9 @@ void CDib::Window_1(double level, double width) {
 	SetColorTable(0, nColors, pColorTable);
 	delete[] pColorTable;
 }
+
+
+// FFT
 
 BOOL CDib::FFT(unsigned char* pDIBBits, long nWidth, long nHeight) {
 	unsigned char* lpSrc;      // 指向源图像的指针

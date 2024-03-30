@@ -51,6 +51,22 @@ vector<vector<complex<double>>> FFT(vector<vector<complex<double>>> const& CTDat
 	return FFT_2D(shift_T);
 }
 
+vector<vector<complex<double>>> IFFT(vector<vector<complex<double>>> const& CFData)
+{
+	int rows = CFData.size();
+	int cols = CFData[0].size();
+	vector<vector<complex<double>>> shift_F(rows, vector<complex<double>>(cols));
+	// 对频域数据进行IFFT
+	vector<vector<complex<double>>> shift_T = IFFT_2D(CFData);
+	// 将IFFT结果乘以-1的i+j次方
+	for (int i = 0; i < rows; i++) {
+		for (int j = 0; j < cols; j++) {
+			shift_F[i][j] = shift_T[i][j] * pow(-1, i + j);
+		}
+	}
+	return shift_F;
+}
+
 vector<complex<double>> FFT_1D(vector<complex<double>> const& CTData) {
 	// 获取数据长度
 	int N = CTData.size();
@@ -149,6 +165,8 @@ vector<vector<complex<double>>> IFFT_2D(vector<vector<complex<double>>> const& C
 	}
 	return result;
 }
+
+
 
 //vector<vector<complex<double>>> FFT(vector<vector<complex<double>>> const& CTData, long nWidth, long nHeight) {
 //	unsigned char* lpSrc;      // 指向源图像的指针
