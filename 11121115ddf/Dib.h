@@ -51,8 +51,8 @@ public:
 	//unsigned char* Padding(int, int);
 	vector<vector<double>> Padding(int, int);	// 填充
 	vector<vector<double>> Conv2d(vector<vector<double>> const&, int = 1, int = 0, int = 0);	// 2D卷积
-	void vector2uchar(vector<vector<unsigned char>> const&);	// 将vector<vector<unsigned char>>转换为unsigned char*
-	void vector2uchar(vector<vector<double>> const&);	// 将vector<vector<double>>转换为unsigned char*
+	void Read_from_vector(vector<vector<unsigned char>> const&);	// 将vector<vector<unsigned char>>读取到m_pDibBits
+	void Read_from_vector(vector<vector<double>> const&);	// 将vector<vector<double>>读取到m_pDibBits
 	void Window_1(double = 127.5, double = 255);
 
 public:
