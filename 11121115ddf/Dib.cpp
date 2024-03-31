@@ -7,7 +7,7 @@
 #include <fstream>
 #include <vector>
 #include "functions.h"
-
+#include <string>
 
 // CDib
 CDib::CDib(void)
@@ -367,7 +367,7 @@ void CDib::LungWindow(double midpoint, double width) {
 
 // Image Processing in Frequency Domain
 
-void CDib::Amplitude()
+vector<vector<double>> CDib::Amplitude()
 {
 	vector<vector<double>> pDibBits2D = Tovector();
 	vector<vector<complex<double>>> CTData = Double2Complex(pDibBits2D);
@@ -387,84 +387,10 @@ void CDib::Amplitude()
 	}
 	vector<vector<double>> pDibBits2D_Amplitude = Complex2Double(CFData);
 	Read(pDibBits2D_Amplitude);
-
-	//unsigned char* pDIBBits = m_pDibBits;
-	//long nWidth = m_nWidth;
-	//long nHeight = m_nHeight;
-	//unsigned char* lpSrc;							// 指向源图像的指针
-	//int y;										// 循环控制变量
-	//int x;										// 循环控制变量
-	//double dTmpOne;								//存放临时变量
-	//double dTmpTwo;								//存放临时变量
-	//int nTransWidth;								// 傅立叶变换的宽度（2的整数次幂）
-	//int nTransHeight;								// 傅立叶变换的高度（2的整数次幂）
-	//double unchValue;								// 存贮图像各像素灰度的临时变量
-	//complex<double>* pCTData;						// 指向时域数据的指针
-	//complex<double>* pCFData;						// 指向频域数据的指针
-	//// 计算进行傅立叶变换的点数－横向	（2的整数次幂）
-	//dTmpOne = log(1.0 * nWidth) / log(2.0);
-	//dTmpTwo = ceil(dTmpOne);
-	//dTmpTwo = pow(2, dTmpTwo);
-	//nTransWidth = (int)dTmpTwo;
-	//// 计算进行傅立叶变换的点数－纵向 （2的整数次幂）
-	//dTmpOne = log(1.0 * nHeight) / log(2.0);
-	//dTmpTwo = ceil(dTmpOne);
-	//dTmpTwo = pow(2, dTmpTwo);
-	//nTransHeight = (int)dTmpTwo;
-	//double dReal;									// 傅立叶变换的实部
-	//double dImag;									// 傅立叶变换的虚部
-
-	//pCTData = new complex<double>[nTransWidth * nTransHeight];	// 分配内存
-	//pCFData = new complex<double>[nTransWidth * nTransHeight];	// 分配内存
-	//// 图像数据的宽和高不一定是2的
-	//// 图像数据的宽和高不一定是2的整数次幂，所以pCTData有一部分数据需要补0
-	//for (y = 0; y < nTransHeight; y++)
-	//{
-	//	for (x = 0; x < nTransWidth; x++)
-	//	{
-	//		pCTData[y * nTransWidth + x] = complex<double>(0, 0);		// 补零
-	//	}
-	//}
-	////把图像数据传给pCTData
-	//for (y = 0; y < nHeight; y++)
-	//{
-	//	for (x = 0; x < nWidth; x++)
-	//	{
-	//		// 指向DIB第y行，第x个象素的指针
-	//		lpSrc = (unsigned char*)pDIBBits + nWidth * (nHeight - 1 - y) + x;
-	//		unchValue = (*lpSrc) * pow(-1.0, x + y);
-	//		pCTData[y * nTransWidth + x] = complex<double>(unchValue, 0);
-	//	}
-	//}
-	//FFT_2D(pCTData, nWidth, nHeight, pCFData);				// 傅立叶正变换
-
-	//double max = pCFData[(nTransHeight / 2) * nTransWidth + (nTransWidth / 2)].real();
-	//max = log(max + 1);
-	//double r = 255 / max;
-	//int ndHeight = (nTransHeight - nHeight) / 2;
-	//int ndWidth = (nTransWidth - nWidth) / 2;
-	//for (y = ndHeight; y < (nTransHeight - ndHeight); y++)
-	//{
-	//	for (x = ndWidth; x < (nTransWidth - ndWidth); x++)
-	//	{
-	//		//需要考虑信号的正负问题以及实际所用的图象数据是灰度值还是原始数据
-	//		double dTmp = abs(pCFData[y * nTransWidth + x]);
-	//		double dTmp1 = log(dTmp + 1);
-	//		dTmp1 = dTmp1 * r;
-	//		// 指向DIB第y行，第x个象素的指针
-	//		lpSrc = (unsigned char*)pDIBBits + nWidth * (nHeight - 1 - y) + x;
-	//		*lpSrc = (BYTE)dTmp1;
-	//	}
-	//}
-
-	//delete[] pCTData;										// 释放内存
-	//delete[] pCFData;										// 释放内存
-	//pCTData = NULL;
-	//pCFData = NULL;
-
+	return pDibBits2D_Amplitude;
 }
 
-void CDib::Phase()
+vector<vector<double>> CDib::Phase()
 {
 	vector<vector<double>> pDibBits2D = Tovector();
 	vector<vector<complex<double>>> CTData = Double2Complex(pDibBits2D);
@@ -484,6 +410,62 @@ void CDib::Phase()
 	}
 	vector<vector<double>> pDibBits2D_Phase = Complex2Double(CFData);
 	Read(pDibBits2D_Phase);
+	return pDibBits2D_Phase;
+}
+
+vector<vector<double>> CDib::Filter(CString filter, CString type, double D0, int n)
+{
+	if (filter == "Ideal") {
+		return IdealFilter(D0, type);
+	}
+	else if (filter == "Butterworth") {
+		return ButterworthFilter(D0, type, n);
+	}
+	else if (filter == "Gaussian") {
+		return GaussianFilter(D0, type);
+	}
+	else {
+		return vector<vector<double>>();
+	}
+}
+
+vector<vector<double>> CDib::IdealFilter(double D0, CString type)
+{
+	vector<vector<double>> pDibBits2D = Tovector();
+	vector<vector<complex<double>>> CTData = Double2Complex(pDibBits2D);
+	vector<vector<complex<double>>> CFData = ::FFT(CTData);
+	vector<vector<double>> filter = ::IdealFilter(D0, type, m_nHeight, m_nWidth);
+	CFData = ::ApplyFilter(CFData, filter);
+	CTData = ::IFFT(CFData);
+	vector<vector<double>> pDibBits2D_Filter = Complex2Double(CTData);
+	Read(pDibBits2D_Filter);
+	return pDibBits2D_Filter;
+}
+
+vector<vector<double>> CDib::ButterworthFilter(double D0, CString type, int n)
+{
+	vector<vector<double>> pDibBits2D = Tovector();
+	vector<vector<complex<double>>> CTData = Double2Complex(pDibBits2D);
+	vector<vector<complex<double>>> CFData = ::FFT(CTData);
+	vector<vector<double>> filter = ::ButterworthFilter(D0, type, n, m_nHeight, m_nWidth);
+	CFData = ::ApplyFilter(CFData, filter);
+	CTData = ::IFFT(CFData);
+	vector<vector<double>> pDibBits2D_Filter = Complex2Double(CTData);
+	Read(pDibBits2D_Filter);
+	return pDibBits2D_Filter;
+}
+
+vector<vector<double>> CDib::GaussianFilter(double D0, CString type)
+{
+	vector<vector<double>> pDibBits2D = Tovector();
+	vector<vector<complex<double>>> CTData = Double2Complex(pDibBits2D);
+	vector<vector<complex<double>>> CFData = ::FFT(CTData);
+	vector<vector<double>> filter = ::GaussianFilter(D0, type, m_nHeight, m_nWidth);
+	CFData = ::ApplyFilter(CFData, filter);
+	CTData = ::IFFT(CFData);
+	vector<vector<double>> pDibBits2D_Filter = Complex2Double(CTData);
+	Read(pDibBits2D_Filter);
+	return pDibBits2D_Filter;
 }
 
 

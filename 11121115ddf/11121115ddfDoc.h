@@ -69,4 +69,6 @@ public:
 	afx_msg void OnWhiterect();
 	afx_msg void OnAmplitude();
 	afx_msg void OnPhase();
+	afx_msg void OnIdealLp();
+	afx_msg void OnSelcfilter();
 };

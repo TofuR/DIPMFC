@@ -8,8 +8,13 @@
 #define IDR_My11121115ddfTYPE           130
 #define IDD_DLG_HISTO                   310
 #define IDD_DLG_ADJWIN                  312
+#define IDD_DLG_FILTER                  314
 #define IDC_MIDPOINT                    1000
 #define IDC_WIDTH                       1001
+#define IDC_D0                          1004
+#define IDC_FILTER_N                    1005
+#define IDC_Filter                      1006
+#define IDC_Type                        1007
 #define ID_32771                        32771
 #define ID_Invert                       32772
 #define ID_32773                        32773
@@ -50,14 +55,26 @@
 #define ID_32808                        32808
 #define ID_Amplitude                    32809
 #define ID_Phase                        32810
+#define ID_32811                        32811
+#define ID_FILTER_IDEAL                 32812
+#define ID_FILTER_BUTTERWORTH           32813
+#define ID_FILTER_GAUSSIAN              32814
+#define ID_IDEAL_LP                     32815
+#define ID_IDEAL_HP                     32816
+#define ID_BUTTERWORTH_LP               32817
+#define ID_BUTTERWORTH_HP               32818
+#define ID_GAUSSIAN_LP                  32819
+#define ID_GAUSSIAN_HP                  32820
+#define ID_32821                        32821
+#define ID_SelcFilter                   32822
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        314
-#define _APS_NEXT_COMMAND_VALUE         32811
-#define _APS_NEXT_CONTROL_VALUE         1003
+#define _APS_NEXT_RESOURCE_VALUE        318
+#define _APS_NEXT_COMMAND_VALUE         32823
+#define _APS_NEXT_CONTROL_VALUE         1008
 #define _APS_NEXT_SYMED_VALUE           310
 #endif
 #endif

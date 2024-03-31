@@ -16,11 +16,12 @@
 
 #include "Dib.h"
 #include "CDlgHistogram.h"
-
+#include "CDlgAdjWindow.h"
+#include "CDlgFilter.h"
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
-#include "CDlgAdjWindow.h"
+
 
 // CMy11121115ddfDoc
 
@@ -44,6 +45,8 @@ BEGIN_MESSAGE_MAP(CMy11121115ddfDoc, CDocument)
 	ON_COMMAND(ID_WhiteRect, &CMy11121115ddfDoc::OnWhiterect)
 	ON_COMMAND(ID_Amplitude, &CMy11121115ddfDoc::OnAmplitude)
 	ON_COMMAND(ID_Phase, &CMy11121115ddfDoc::OnPhase)
+	ON_COMMAND(ID_IDEAL_LP, &CMy11121115ddfDoc::OnIdealLp)
+	ON_COMMAND(ID_SelcFilter, &CMy11121115ddfDoc::OnSelcfilter)
 END_MESSAGE_MAP()
 
 
@@ -407,5 +410,38 @@ void CMy11121115ddfDoc::OnPhase()
 	{
 		m_pDib->Phase();
 		UpdateAllViews(NULL);
+	}
+}
+
+
+void CMy11121115ddfDoc::OnIdealLp()
+{
+	// TODO: 在此添加命令处理程序代码
+	if (m_pDib != NULL)
+	{
+		CDlgFilter dlg;
+		dlg.m_D0 = 5;
+		if (dlg.DoModal() == IDOK)
+		{
+			m_pDib->Filter(L"Ideal", L"lowpass", dlg.m_D0, dlg.m_N);
+			UpdateAllViews(NULL);
+		}
+	}
+}
+
+
+void CMy11121115ddfDoc::OnSelcfilter()
+{
+	// TODO: 在此添加命令处理程序代码
+	if (m_pDib != NULL)
+	{
+		CDlgFilter dlg;
+		dlg.m_D0 = 5;
+		dlg.m_N = 2;
+		if (dlg.DoModal() == IDOK)
+		{
+			m_pDib->Filter(dlg.m_Filter, dlg.m_Type, dlg.m_D0, dlg.m_N);
+			UpdateAllViews(NULL);
+		}
 	}
 }

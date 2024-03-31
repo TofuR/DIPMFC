@@ -48,6 +48,12 @@
     <ClInclude Include="CDlgAdjWindow.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="functions.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="CDlgFilter.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="11121115ddf.cpp">
@@ -72,6 +78,12 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="CDlgAdjWindow.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="functions.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="CDlgFilter.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

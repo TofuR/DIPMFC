@@ -3,6 +3,7 @@
 
 #include <complex>
 #include <vector>
+#include <string>
 using namespace std;
 
 #define  MAX_SIZE 1000
@@ -44,8 +45,12 @@ public:
 	void LungWindow(double = 64, double = 92);	//显示肺部CT图像肺窗
 
 public:
-	void Amplitude();
-	void Phase();
+	vector<vector<double>> Amplitude();
+	vector<vector<double>> Phase();
+	vector<vector<double>> Filter(CString filter, CString type, double D0, int n);
+	vector<vector<double>> IdealFilter(double D0, CString type);
+	vector<vector<double>> ButterworthFilter(double D0, CString type, int n);
+	vector<vector<double>> GaussianFilter(double D0, CString type);
 
 public:
 	long* GrayValueCount();	// 获取灰度值统计
