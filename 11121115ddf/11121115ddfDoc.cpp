@@ -436,7 +436,7 @@ void CMy11121115ddfDoc::OnSelcfilter()
 	if (m_pDib != NULL)
 	{
 		CDlgFilter dlg;
-		dlg.m_D0 = 5;
+		dlg.m_D0 = 50;
 		dlg.m_N = 2;
 		if (dlg.DoModal() == IDOK)
 		{

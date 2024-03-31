@@ -48,9 +48,6 @@ public:
 	vector<vector<double>> Amplitude();
 	vector<vector<double>> Phase();
 	vector<vector<double>> Filter(CString filter, CString type, double D0, int n);
-	vector<vector<double>> IdealFilter(double D0, CString type);
-	vector<vector<double>> ButterworthFilter(double D0, CString type, int n);
-	vector<vector<double>> GaussianFilter(double D0, CString type);
 
 public:
 	long* GrayValueCount();	// 获取灰度值统计

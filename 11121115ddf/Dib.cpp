@@ -415,57 +415,27 @@ vector<vector<double>> CDib::Phase()
 
 vector<vector<double>> CDib::Filter(CString filter, CString type, double D0, int n)
 {
+	vector<vector<double>> pDibBits2D = Tovector();		// 读取图像为二维数组
+	vector<vector<complex<double>>> CTData = Double2Complex(pDibBits2D);	// 将二维数组转换为复数二维数组
+	vector<vector<complex<double>>> CFData = ::FFT(CTData);	// 对复数二维数组进行傅里叶变换（重写了对vector操作的FFT函数，在functions.h里面）
+	vector<vector<double>> Filter;	// 滤波器
 	if (filter == "Ideal") {
-		return IdealFilter(D0, type);
+		Filter = ::IdealFilter(D0, type, m_nHeight, m_nWidth);
 	}
 	else if (filter == "Butterworth") {
-		return ButterworthFilter(D0, type, n);
+		Filter = ::ButterworthFilter(D0, type, n, m_nHeight, m_nWidth);
 	}
 	else if (filter == "Gaussian") {
-		return GaussianFilter(D0, type);
+		Filter = ::GaussianFilter(D0, type, m_nHeight, m_nWidth);
 	}
 	else {
 		return vector<vector<double>>();
 	}
-}
-
-vector<vector<double>> CDib::IdealFilter(double D0, CString type)
-{
-	vector<vector<double>> pDibBits2D = Tovector();
-	vector<vector<complex<double>>> CTData = Double2Complex(pDibBits2D);
-	vector<vector<complex<double>>> CFData = ::FFT(CTData);
-	vector<vector<double>> filter = ::IdealFilter(D0, type, m_nHeight, m_nWidth);
-	CFData = ::ApplyFilter(CFData, filter);
-	CTData = ::IFFT(CFData);
-	vector<vector<double>> pDibBits2D_Filter = Complex2Double(CTData);
-	Read(pDibBits2D_Filter);
-	return pDibBits2D_Filter;
-}
-
-vector<vector<double>> CDib::ButterworthFilter(double D0, CString type, int n)
-{
-	vector<vector<double>> pDibBits2D = Tovector();
-	vector<vector<complex<double>>> CTData = Double2Complex(pDibBits2D);
-	vector<vector<complex<double>>> CFData = ::FFT(CTData);
-	vector<vector<double>> filter = ::ButterworthFilter(D0, type, n, m_nHeight, m_nWidth);
-	CFData = ::ApplyFilter(CFData, filter);
-	CTData = ::IFFT(CFData);
-	vector<vector<double>> pDibBits2D_Filter = Complex2Double(CTData);
-	Read(pDibBits2D_Filter);
-	return pDibBits2D_Filter;
-}
-
-vector<vector<double>> CDib::GaussianFilter(double D0, CString type)
-{
-	vector<vector<double>> pDibBits2D = Tovector();
-	vector<vector<complex<double>>> CTData = Double2Complex(pDibBits2D);
-	vector<vector<complex<double>>> CFData = ::FFT(CTData);
-	vector<vector<double>> filter = ::GaussianFilter(D0, type, m_nHeight, m_nWidth);
-	CFData = ::ApplyFilter(CFData, filter);
-	CTData = ::IFFT(CFData);
-	vector<vector<double>> pDibBits2D_Filter = Complex2Double(CTData);
-	Read(pDibBits2D_Filter);
-	return pDibBits2D_Filter;
+	CFData = ::ApplyFilter(CFData, Filter);	// 对频域数据进行滤波
+	CTData = ::IFFT(CFData);	// 对滤波后的频域数据进行傅里叶反变换
+	vector<vector<double>> pDibBits2D_Filter = Complex2Double(CTData);	// 将复数二维数组转换为二维数组
+	Read(pDibBits2D_Filter);	// 将二维数组写入图像
+	return pDibBits2D_Filter;	// 返回二维数组，增加代码之后的复用性
 }
 
 

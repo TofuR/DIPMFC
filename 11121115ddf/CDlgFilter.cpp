@@ -53,16 +53,16 @@ BOOL CDlgFilter::OnInitDialog()
 	CDialogEx::OnInitDialog();
 
 	// TODO:  在此添加额外的初始化
-	m_Edit_D0.SetWindowTextW(L"5");
+	m_Edit_D0.SetWindowTextW(L"50");
 	m_Edit_N.SetWindowTextW(L"2");
 	m_Combo_Filter.SetCurSel(0);
 	m_Combo_Type.SetCurSel(0);
-	m_D0 = 5;
+	m_D0 = 50;
 	m_N = 2;
 	m_Filter = "Ideal";
 	m_Type = "lowpass";
 	m_Edit_N.EnableWindow(FALSE);
-
+	UpdateData(FALSE);
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// 异常: OCX 属性页应返回 FALSE
 }
