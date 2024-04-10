@@ -48,6 +48,7 @@ BEGIN_MESSAGE_MAP(CMy11121115ddfDoc, CDocument)
 	ON_COMMAND(ID_IDEAL_LP, &CMy11121115ddfDoc::OnIdealLp)
 	ON_COMMAND(ID_SelcFilter, &CMy11121115ddfDoc::OnSelcfilter)
 	ON_COMMAND(ID_Median, &CMy11121115ddfDoc::OnMedian)
+	ON_COMMAND(ID_AdaptiveMedian, &CMy11121115ddfDoc::OnAdaptivemedian)
 END_MESSAGE_MAP()
 
 
@@ -454,6 +455,17 @@ void CMy11121115ddfDoc::OnMedian()
 	if (m_pDib != NULL)
 	{
 		m_pDib->MedianFilter();
+		UpdateAllViews(NULL);
+	}
+}
+
+
+void CMy11121115ddfDoc::OnAdaptivemedian()
+{
+	// TODO: 在此添加命令处理程序代码
+	if (m_pDib != NULL)
+	{
+		m_pDib->AdaptiveMedianFilter();
 		UpdateAllViews(NULL);
 	}
 }

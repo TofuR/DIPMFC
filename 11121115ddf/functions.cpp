@@ -38,6 +38,19 @@ vector<vector<double>> Complex2Double(vector<vector<complex<double>>> const& inp
 	return output;
 }
 
+vector<vector<double>> ZeroPadding(vector<vector<double>> const& Data, int a, int b)
+{
+	int rows = Data.size();
+	int cols = Data[0].size();
+	vector<vector<double>> result(rows + a * 2, vector<double>(cols + b * 2, 0));
+	for (int i = a; i < rows + a; i++) {
+		for (int j = b; j < cols + b; j++) {
+			result[i][j] = Data[i - a][j - b];
+		}
+	}
+	return result;
+}
+
 vector<vector<complex<double>>> FFT(vector<vector<complex<double>>> const& CTData)
 {
 	int rows = CTData.size();
@@ -244,18 +257,58 @@ vector<vector<complex<double>>> ApplyFilter(vector<vector<complex<double>>> cons
 
 vector<vector<double>> MedianFilter(vector<vector<double>> const& Data, int nHeight, int nWidth, int nSize)
 {
+	// 为了方便处理边界，对原始数据进行零填充
+	vector<vector<double>> DataZeroPadding = ZeroPadding(Data, nSize / 2, nSize / 2);
 	vector<vector<double>> result(nHeight, vector<double>(nWidth, 0));
-	int nHalfSize = nSize / 2;
-	for (int i = nHalfSize; i < nHeight - nHalfSize; i++) {
-		for (int j = nHalfSize; j < nWidth - nHalfSize; j++) {
+	for (int i = nSize / 2; i < nHeight + nSize / 2; i++) {
+		for (int j = nSize / 2; j < nWidth + nSize / 2; j++) {
 			vector<double> temp;
-			for (int m = -nHalfSize; m <= nHalfSize; m++) {
-				for (int n = -nHalfSize; n <= nHalfSize; n++) {
-					temp.push_back(Data[i + m][j + n]);
+			for (int m = -nSize / 2; m <= nSize / 2; m++) {
+				for (int n = -nSize / 2; n <= nSize / 2; n++) {
+					temp.push_back(DataZeroPadding[i + m][j + n]);
 				}
 			}
 			sort(temp.begin(), temp.end());
-			result[i][j] = temp[nSize * nSize / 2];
+			result[i - nSize / 2][j - nSize / 2] = temp[nSize * nSize / 2];
+		}
+	}
+	return result;
+}
+
+vector<vector<double>> AdaptiveMedianFilter(vector<vector<double>> const& Data, int nHeight, int nWidth, int nSizeMax)
+{
+	// 为了方便处理边界，对原始数据进行零填充
+	vector<vector<double>> DataZeroPadding = ZeroPadding(Data, nSizeMax / 2, nSizeMax / 2);
+	vector<vector<double>> result(nHeight, vector<double>(nWidth, 0));
+	for (int i = nSizeMax / 2; i < nHeight + nSizeMax / 2; i++) {
+		for (int j = nSizeMax / 2; j < nWidth + nSizeMax / 2; j++) {
+			int nSize = 3;
+			while (nSize <= nSizeMax) {
+				vector<double> temp;
+				for (int m = -nSize / 2; m <= nSize / 2; m++) {
+					for (int n = -nSize / 2; n <= nSize / 2; n++) {
+						temp.push_back(DataZeroPadding[i + m][j + n]);
+					}
+				}
+				sort(temp.begin(), temp.end());
+				double Zmin = temp[0];
+				double Zmax = temp[nSize * nSize - 1];
+				double Zmed = temp[nSize * nSize / 2];
+				double Zxy = DataZeroPadding[i][j];
+				if (Zmed > Zmin && Zmed < Zmax) {
+					if (Zxy > Zmin && Zxy < Zmax) {
+						result[i - nSizeMax / 2][j - nSizeMax / 2] = Zxy;
+						break;
+					}
+					else {
+						result[i - nSizeMax / 2][j - nSizeMax / 2] = Zmed;
+						break;
+					}
+				}
+				else {
+					nSize += 2;
+				}
+			}
 		}
 	}
 	return result;

@@ -51,6 +51,7 @@ public:
 
 public:
 	vector<vector<double>> MedianFilter(int = 3);	// 中值滤波
+	vector<vector<double>> AdaptiveMedianFilter(int = 19);	// 均值滤波
 
 public:
 	long* GrayValueCount();	// 获取灰度值统计

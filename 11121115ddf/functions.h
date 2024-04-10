@@ -14,6 +14,8 @@ vector<vector<complex<double>>> Double2Complex(vector<vector<double>> const&);
 
 vector<vector<double>> Complex2Double(vector<vector<complex<double>>> const&);
 
+vector<vector<double>> ZeroPadding(vector<vector<double>> const&, int, int);
+
 // FFT and IFFT
 
 vector<vector<complex<double>>> FFT(vector<vector<complex<double>>> const&);
@@ -41,3 +43,5 @@ vector<vector<complex<double>>> ApplyFilter(vector<vector<complex<double>>> cons
 // Image Processing
 
 vector<vector<double>> MedianFilter(vector<vector<double>> const& Data, int nHeight, int nWidth, int nSize);
+
+vector<vector<double>> AdaptiveMedianFilter(vector<vector<double>> const& Data, int nHeight, int nWidth, int nSizeMax);
