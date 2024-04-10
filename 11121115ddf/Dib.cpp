@@ -438,6 +438,52 @@ vector<vector<double>> CDib::Filter(CString filter, CString type, double D0, int
 	return pDibBits2D_Filter;	// 返回二维数组，增加代码之后的复用性
 }
 
+
+// Image Restoration
+
+vector<vector<double>> CDib::HufnagelDegration(double k)
+{
+	vector<vector<double>> pDibBits2D = Tovector();	// 读取图像为二维数组
+	// 对二维数组进行Hufnagel退化
+	vector<vector<double>> H(m_nHeight, vector<double>(m_nWidth, 0));
+	// 计算Hufnagel and Stanley[1964]退化滤波器
+	for (int i = 0; i < m_nHeight; i++) {
+		for (int j = 0; j < m_nWidth; j++) {
+			H[i][j] = pow(Ei, -k * pow((pow(i - m_nHeight / 2, 2) + pow(j - m_nWidth / 2, 2)), 5.0 / 6.0));
+		}
+	}
+	vector<vector<complex<double>>> CFData = ::FFT(Double2Complex(pDibBits2D));
+	vector<vector<complex<double>>> Filter = Double2Complex(H);
+	// 对频域数据与Hufnagel退化滤波器进行卷积
+	CFData = ::ApplyFilter(CFData, Complex2Double(Filter));
+	vector<vector<double>> pDibBits2D_De = Complex2Double(::IFFT(CFData));
+	Read(pDibBits2D_De);	// 将二维数组写入图像
+	return pDibBits2D_De;	// 返回二维数组，增加代码之后的复用性
+}
+
+vector<vector<double>> CDib::InverseFilter(double D0, double k)
+{
+	vector<vector<double>> pDibBits2D = Tovector();	// 读取图像为二维数组
+	vector<vector<complex<double>>> CTData = Double2Complex(pDibBits2D);	// 将二维数组转换为复数二维数组
+	vector<vector<complex<double>>> CFData = ::FFT(CTData);	// 对复数二维数组进行傅里叶变换（重写了对vector操作的FFT函数，在functions.h里面）
+	vector<vector<double>> Filter(m_nHeight, vector<double>(m_nWidth, 0));
+	for (int i = 0; i < m_nHeight; i++) {
+		for (int j = 0; j < m_nWidth; j++) {
+			if (sqrt(pow(i - m_nHeight / 2, 2) + pow(j - m_nWidth / 2, 2)) <= D0) {
+				Filter[i][j] = 1.0 / pow(Ei, -k * pow((pow(i - m_nHeight / 2, 2) + pow(j - m_nWidth / 2, 2)), 5.0 / 6.0));
+			}
+			else {
+				Filter[i][j] = 0;
+			}
+		}
+	}
+	CFData = ::ApplyFilter(CFData, Filter);	// 对频域数据进行滤波
+	CTData = ::IFFT(CFData);	// 对滤波后的频域数据进行傅里叶反变换
+	vector<vector<double>> pDibBits2D_De = Complex2Double(CTData);	// 将复数二维数组转换为二维数组
+	Read(pDibBits2D_De);	// 将二维数组写入图像
+	return pDibBits2D_De;	// 返回二维数组，增加代码之后的复用性
+}
+
 vector<vector<double>> CDib::MedianFilter(int size)
 {
 	vector<vector<double>> pDibBits2D = Tovector();	// 读取图像为二维数组

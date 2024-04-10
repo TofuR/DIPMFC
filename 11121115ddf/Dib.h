@@ -50,6 +50,8 @@ public:
 	vector<vector<double>> Filter(CString filter, CString type, double D0, int n);
 
 public:
+	vector<vector<double>> HufnagelDegration(double k);
+	vector<vector<double>> InverseFilter(double D0, double k);
 	vector<vector<double>> MedianFilter(int = 3);	// 中值滤波
 	vector<vector<double>> AdaptiveMedianFilter(int = 19);	// 均值滤波
 

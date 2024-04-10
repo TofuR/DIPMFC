@@ -73,4 +73,6 @@ public:
 	afx_msg void OnSelcfilter();
 	afx_msg void OnMedian();
 	afx_msg void OnAdaptivemedian();
+	afx_msg void OnDegradation();
+	afx_msg void OnInversefilter();
 };

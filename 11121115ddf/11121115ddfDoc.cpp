@@ -49,6 +49,8 @@ BEGIN_MESSAGE_MAP(CMy11121115ddfDoc, CDocument)
 	ON_COMMAND(ID_SelcFilter, &CMy11121115ddfDoc::OnSelcfilter)
 	ON_COMMAND(ID_Median, &CMy11121115ddfDoc::OnMedian)
 	ON_COMMAND(ID_AdaptiveMedian, &CMy11121115ddfDoc::OnAdaptivemedian)
+	ON_COMMAND(ID_Degradation, &CMy11121115ddfDoc::OnDegradation)
+	ON_COMMAND(ID_InverseFilter, &CMy11121115ddfDoc::OnInversefilter)
 END_MESSAGE_MAP()
 
 
@@ -454,7 +456,8 @@ void CMy11121115ddfDoc::OnMedian()
 	// TODO: 在此添加命令处理程序代码
 	if (m_pDib != NULL)
 	{
-		m_pDib->MedianFilter();
+		int size = 3;
+		m_pDib->MedianFilter(size);
 		UpdateAllViews(NULL);
 	}
 }
@@ -465,7 +468,33 @@ void CMy11121115ddfDoc::OnAdaptivemedian()
 	// TODO: 在此添加命令处理程序代码
 	if (m_pDib != NULL)
 	{
-		m_pDib->AdaptiveMedianFilter();
+		int SizeMax = 19;
+		m_pDib->AdaptiveMedianFilter(SizeMax);
+		UpdateAllViews(NULL);
+	}
+}
+
+
+void CMy11121115ddfDoc::OnDegradation()
+{
+	// TODO: 在此添加命令处理程序代码
+	if (m_pDib != NULL)
+	{
+		double k = 0.001;
+		m_pDib->HufnagelDegration(k);
+		UpdateAllViews(NULL);
+	}
+}
+
+
+void CMy11121115ddfDoc::OnInversefilter()
+{
+	// TODO: 在此添加命令处理程序代码
+	if (m_pDib != NULL)
+	{
+		double k = 0.001;
+		double D0 = 150;
+		m_pDib->InverseFilter(D0, k);
 		UpdateAllViews(NULL);
 	}
 }
