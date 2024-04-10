@@ -50,6 +50,9 @@ public:
 	vector<vector<double>> Filter(CString filter, CString type, double D0, int n);
 
 public:
+	vector<vector<double>> MedianFilter(int = 3);	// 中值滤波
+
+public:
 	long* GrayValueCount();	// 获取灰度值统计
 	//unsigned char* Padding(int, int);
 	vector<vector<double>> Padding(int, int);	// 填充

@@ -37,3 +37,7 @@ vector<vector<double>> ButterworthFilter(double D0, CString type, int n, int nHe
 vector<vector<double>> GaussianFilter(double D0, CString type, int nHeight, int nWidth);
 
 vector<vector<complex<double>>> ApplyFilter(vector<vector<complex<double>>> const& CFData, vector<vector<double>> const& FilterData);
+
+// Image Processing
+
+vector<vector<double>> MedianFilter(vector<vector<double>> const& Data, int nHeight, int nWidth, int nSize);

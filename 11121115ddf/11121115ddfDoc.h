@@ -71,4 +71,5 @@ public:
 	afx_msg void OnPhase();
 	afx_msg void OnIdealLp();
 	afx_msg void OnSelcfilter();
+	afx_msg void OnMedian();
 };

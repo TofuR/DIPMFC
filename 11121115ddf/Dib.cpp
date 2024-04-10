@@ -438,6 +438,14 @@ vector<vector<double>> CDib::Filter(CString filter, CString type, double D0, int
 	return pDibBits2D_Filter;	// 返回二维数组，增加代码之后的复用性
 }
 
+vector<vector<double>> CDib::MedianFilter(int size)
+{
+	vector<vector<double>> pDibBits2D = Tovector();	// 读取图像为二维数组
+	vector<vector<double>> pDibBits2D_Filter = ::MedianFilter(pDibBits2D, m_nHeight, m_nWidth, size);	// 对二维数组进行中值滤波
+	Read(pDibBits2D_Filter);	// 将二维数组写入图像
+	return pDibBits2D_Filter;	// 返回二维数组，增加代码之后的复用性
+}
+
 
 // some functions
 

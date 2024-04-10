@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "functions.h"
+#include <algorithm>
 
 
 double findmax(vector<vector<double>> const& matrix)
@@ -236,6 +237,25 @@ vector<vector<complex<double>>> ApplyFilter(vector<vector<complex<double>>> cons
 	for (int i = 0; i < rows; i++) {
 		for (int j = 0; j < cols; j++) {
 			result[i][j] = CFData[i][j] * FilterData[i][j];
+		}
+	}
+	return result;
+}
+
+vector<vector<double>> MedianFilter(vector<vector<double>> const& Data, int nHeight, int nWidth, int nSize)
+{
+	vector<vector<double>> result(nHeight, vector<double>(nWidth, 0));
+	int nHalfSize = nSize / 2;
+	for (int i = nHalfSize; i < nHeight - nHalfSize; i++) {
+		for (int j = nHalfSize; j < nWidth - nHalfSize; j++) {
+			vector<double> temp;
+			for (int m = -nHalfSize; m <= nHalfSize; m++) {
+				for (int n = -nHalfSize; n <= nHalfSize; n++) {
+					temp.push_back(Data[i + m][j + n]);
+				}
+			}
+			sort(temp.begin(), temp.end());
+			result[i][j] = temp[nSize * nSize / 2];
 		}
 	}
 	return result;

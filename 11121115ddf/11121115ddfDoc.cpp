@@ -47,6 +47,7 @@ BEGIN_MESSAGE_MAP(CMy11121115ddfDoc, CDocument)
 	ON_COMMAND(ID_Phase, &CMy11121115ddfDoc::OnPhase)
 	ON_COMMAND(ID_IDEAL_LP, &CMy11121115ddfDoc::OnIdealLp)
 	ON_COMMAND(ID_SelcFilter, &CMy11121115ddfDoc::OnSelcfilter)
+	ON_COMMAND(ID_Median, &CMy11121115ddfDoc::OnMedian)
 END_MESSAGE_MAP()
 
 
@@ -443,5 +444,16 @@ void CMy11121115ddfDoc::OnSelcfilter()
 			m_pDib->Filter(dlg.m_Filter, dlg.m_Type, dlg.m_D0, dlg.m_N);
 			UpdateAllViews(NULL);
 		}
+	}
+}
+
+
+void CMy11121115ddfDoc::OnMedian()
+{
+	// TODO: 在此添加命令处理程序代码
+	if (m_pDib != NULL)
+	{
+		m_pDib->MedianFilter();
+		UpdateAllViews(NULL);
 	}
 }
