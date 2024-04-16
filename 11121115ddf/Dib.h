@@ -26,11 +26,9 @@ public:
 
 public:
 	void LoadFile(LPCTSTR lpszPathName);
-	//read raw picture
-	void LoadRawFile(LPCTSTR lpszPathName);
+	//void LoadRawFile(LPCTSTR lpszPathName);
 	void LoadRawFile(istream& data);
-	// 读取包含多张图片的raw文件
-	void LoadRawFile(LPCTSTR lpszPathName, int numImages);
+	void LoadRawFile(LPCTSTR lpszPathName);
 	void CreateDisplayDib(uint16_t* pRawBuffer, int nWidth, int nHeight, int nBitCount);
 	void CreateWhiteRect(double = 512, double = 512, double = 100, double = 100);
 
@@ -67,6 +65,7 @@ public:
 	vector<vector<double>> Padding(int, int);	// 填充
 	vector<vector<double>> Conv2d(vector<vector<double>> const&, int = 1, int = 0, int = 0);	// 2D卷积
 	vector<vector<double>> Tovector();	// 将m_pDibBits读取到vector<vector<double>>
+	vector<RealMatrix> TovectorMatrix();	// 将m_pRawBuffers读取到vector<Matrix<double>>
 	void Read(vector<vector<unsigned char>> const&);	// 将vector<vector<unsigned char>>读取到m_pDibBits
 	void Read(vector<vector<double>> const&);	// 将vector<vector<double>>读取到m_pDibBits
 	void Window_1(double = 127.5, double = 255);

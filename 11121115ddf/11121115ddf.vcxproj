@@ -194,6 +194,7 @@
     <ClInclude Include="CDlgCutoff.h" />
     <ClInclude Include="CDlgFilter.h" />
     <ClInclude Include="CDlgHistogram.h" />
+    <ClInclude Include="CDlgThreeViews.h" />
     <ClInclude Include="Dib.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="functions.h" />
@@ -211,6 +212,7 @@
     <ClCompile Include="CDlgCutoff.cpp" />
     <ClCompile Include="CDlgFilter.cpp" />
     <ClCompile Include="CDlgHistogram.cpp" />
+    <ClCompile Include="CDlgThreeViews.cpp" />
     <ClCompile Include="Dib.cpp" />
     <ClCompile Include="functions.cpp" />
     <ClCompile Include="MainFrm.cpp" />

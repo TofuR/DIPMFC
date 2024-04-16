@@ -82,7 +82,7 @@ void CDib::LoadFile(LPCTSTR lpszPathName) {
 		strPathName.Mid(nDotIndex + 1);  // 取出文件名"."以后的内容
 	strExtension.MakeLower();            // 将扩展名转换为小写
 	if (strExtension == _T("raw")) {
-		LoadRawFile(lpszPathName, 313);
+		LoadRawFile(lpszPathName);
 	}
 	else {
 		Load(lpszPathName);
@@ -94,36 +94,36 @@ void CDib::LoadFile(LPCTSTR lpszPathName) {
 	}
 }
 
-void CDib::LoadRawFile(LPCTSTR lpszPathName) {
-	m_nWidth = 512;
-	m_nHeight = 512;
-
-	// 创建暂存文件像素值的缓冲区//16位，保存raw
-	if (m_pRawBuffer != NULL) {
-		delete[] m_pRawBuffer;
-		m_pRawBuffer = NULL;
-	}
-	m_pRawBuffer = new uint16_t[m_nWidth * m_nHeight];
-	memset(m_pRawBuffer, 0, m_nWidth * m_nHeight * sizeof(uint16_t));
-
-	// 使用fistream读取raw文件的像素值进buffer
-	std::ifstream file(lpszPathName, std::ios::binary);
-	file.read(reinterpret_cast<char*>(m_pRawBuffer),
-		m_nWidth * m_nHeight * sizeof(uint16_t));
-
-	// 文件打开失败弹出警告，然后退出
-	if (file.fail()) {
-		AfxMessageBox(_T("读取文件失败"));
-		return;
-	}
-	file.close();
-	// 因为读取进来的像素高8位和低8位顺序是反的，这里对像素高低8位进行对调，同时获取最大值
-	for (int i = 0; i < m_nWidth * m_nHeight; i++) {
-		m_pRawBuffer[i] =
-			((m_pRawBuffer[i] & 0xff00) >> 8) | ((m_pRawBuffer[i] & 0x00ff) << 8);
-	}
-	CreateDisplayDib(m_pRawBuffer, m_nWidth, m_nHeight, 8);
-}
+//void CDib::LoadRawFile(LPCTSTR lpszPathName) {
+//	m_nWidth = 512;
+//	m_nHeight = 512;
+//
+//	// 创建暂存文件像素值的缓冲区//16位，保存raw
+//	if (m_pRawBuffer != NULL) {
+//		delete[] m_pRawBuffer;
+//		m_pRawBuffer = NULL;
+//	}
+//	m_pRawBuffer = new uint16_t[m_nWidth * m_nHeight];
+//	memset(m_pRawBuffer, 0, m_nWidth * m_nHeight * sizeof(uint16_t));
+//
+//	// 使用fistream读取raw文件的像素值进buffer
+//	std::ifstream file(lpszPathName, std::ios::binary);
+//	file.read(reinterpret_cast<char*>(m_pRawBuffer),
+//		m_nWidth * m_nHeight * sizeof(uint16_t));
+//
+//	// 文件打开失败弹出警告，然后退出
+//	if (file.fail()) {
+//		AfxMessageBox(_T("读取文件失败"));
+//		return;
+//	}
+//	file.close();
+//	// 因为读取进来的像素高8位和低8位顺序是反的，这里对像素高低8位进行对调，同时获取最大值
+//	for (int i = 0; i < m_nWidth * m_nHeight; i++) {
+//		m_pRawBuffer[i] =
+//			((m_pRawBuffer[i] & 0xff00) >> 8) | ((m_pRawBuffer[i] & 0x00ff) << 8);
+//	}
+//	CreateDisplayDib(m_pRawBuffer, m_nWidth, m_nHeight, 8);
+//}
 
 void CDib::LoadRawFile(istream& data)
 {
@@ -144,7 +144,7 @@ void CDib::LoadRawFile(istream& data)
 	m_pRawBuffers.push_back(m_pRawBuffer);
 }
 
-void CDib::LoadRawFile(LPCTSTR lpszPathName, int numImages)
+void CDib::LoadRawFile(LPCTSTR lpszPathName)
 {
 	m_nWidth = 512;
 	m_nHeight = 512;
@@ -156,6 +156,11 @@ void CDib::LoadRawFile(LPCTSTR lpszPathName, int numImages)
 		AfxMessageBox(_T("无法打开文件"));
 		return;
 	}
+	size_t imageSize = m_nWidth * m_nHeight * sizeof(uint16_t);
+	file.seekg(0, std::ios::end);
+	int totalFileSize = file.tellg();
+	file.seekg(0, std::ios::beg);
+	int numImages = totalFileSize / imageSize;
 
 	if (m_pRawBuffer != NULL) {
 		delete[] m_pRawBuffer;
@@ -173,7 +178,7 @@ void CDib::LoadRawFile(LPCTSTR lpszPathName, int numImages)
 	}
 
 	file.close();
-	m_pRawBuffer = m_pRawBuffers[100];
+	m_pRawBuffer = m_pRawBuffers.front();
 	CreateDisplayDib(m_pRawBuffer, m_nWidth, m_nHeight, 8);
 }
 
@@ -629,13 +634,31 @@ vector<vector<double>> CDib::Conv2d(vector<vector<double>> const& kernel,
 
 vector<vector<double>> CDib::Tovector()
 {
-	vector<vector<double>> pDibBits2D(m_nHeight, vector<double>(m_nWidthBytes, 0));
-	for (int i = 0; i < m_nHeight; i++) {
-		for (int j = 0; j < m_nWidthBytes; j++) {
-			pDibBits2D[i][j] = *(m_pDibBits + i * m_nWidthBytes + j);
+	if (m_nBitCount == 8) {
+		Matrix<double> pDibBits2D(m_nHeight, vector<double>(m_nWidthBytes, 0));
+		for (int i = 0; i < m_nHeight; i++) {
+			for (int j = 0; j < m_nWidthBytes; j++) {
+				pDibBits2D[i][j] = *(m_pDibBits + i * m_nWidthBytes + j);
+			}
 		}
+		return pDibBits2D;
 	}
-	return pDibBits2D;
+}
+
+vector<RealMatrix> CDib::TovectorMatrix()
+{
+	// 将m_pRawBuffers读取到vector<Matrix<double>>中
+	vector<RealMatrix> matrix3d;
+	for (auto& p : m_pRawBuffers) {
+		RealMatrix matrix(m_nHeight, vector<double>(m_nWidth, 0));
+		for (int i = 0; i < m_nHeight; i++) {
+			for (int j = 0; j < m_nWidth; j++) {
+				matrix[i][j] = p[i * m_nWidth + j];
+			}
+		}
+		matrix3d.push_back(matrix);
+	}
+	return matrix3d;
 }
 
 void CDib::Read(vector<vector<unsigned char>> const& pDibBits2D) {

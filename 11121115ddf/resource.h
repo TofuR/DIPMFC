@@ -10,14 +10,21 @@
 #define IDD_DLG_ADJWIN                  312
 #define IDD_DLG_FILTER                  314
 #define IDD_DLG_CUTOFF                  318
+#define IDD_DLG_THVIEW                  320
 #define IDC_MIDPOINT                    1000
 #define IDC_WIDTH                       1001
 #define IDC_D0                          1004
 #define IDC_FILTER_N                    1005
 #define IDC_Filter                      1006
 #define IDC_Type                        1007
-#define IDC_EDIT1                       1008
 #define IDC_CUTOFF                      1008
+#define IDC_TXT_TRA                     1009
+#define IDC_TXT_COR                     1010
+#define IDC_TXT_SAG                     1011
+#define IDC_SLI_TRA                     1012
+#define IDC_SLI_COR                     1013
+#define IDC_SLIDER3                     1014
+#define IDC_SLI_SAG                     1014
 #define ID_32771                        32771
 #define ID_Invert                       32772
 #define ID_32773                        32773
@@ -85,9 +92,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        320
+#define _APS_NEXT_RESOURCE_VALUE        322
 #define _APS_NEXT_COMMAND_VALUE         32833
-#define _APS_NEXT_CONTROL_VALUE         1009
+#define _APS_NEXT_CONTROL_VALUE         1015
 #define _APS_NEXT_SYMED_VALUE           310
 #endif
 #endif
