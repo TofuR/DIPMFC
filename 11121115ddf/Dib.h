@@ -52,8 +52,10 @@ public:
 public:
 	vector<vector<double>> HufnagelDegration(double k);
 	vector<vector<double>> InverseFilter(double D0, double k);
+	vector<vector<double>> WienerFilter(double k);	// 维纳滤波
 	vector<vector<double>> MedianFilter(int = 3);	// 中值滤波
 	vector<vector<double>> AdaptiveMedianFilter(int = 19);	// 均值滤波
+
 
 public:
 	long* GrayValueCount();	// 获取灰度值统计

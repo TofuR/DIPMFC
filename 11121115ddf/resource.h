@@ -9,12 +9,15 @@
 #define IDD_DLG_HISTO                   310
 #define IDD_DLG_ADJWIN                  312
 #define IDD_DLG_FILTER                  314
+#define IDD_DLG_CUTOFF                  318
 #define IDC_MIDPOINT                    1000
 #define IDC_WIDTH                       1001
 #define IDC_D0                          1004
 #define IDC_FILTER_N                    1005
 #define IDC_Filter                      1006
 #define IDC_Type                        1007
+#define IDC_EDIT1                       1008
+#define IDC_CUTOFF                      1008
 #define ID_32771                        32771
 #define ID_Invert                       32772
 #define ID_32773                        32773
@@ -75,14 +78,16 @@
 #define ID_Degradation                  32828
 #define ID_32829                        32829
 #define ID_InverseFilter                32830
+#define ID_32831                        32831
+#define ID_WienerFilter                 32832
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        318
-#define _APS_NEXT_COMMAND_VALUE         32831
-#define _APS_NEXT_CONTROL_VALUE         1008
+#define _APS_NEXT_RESOURCE_VALUE        320
+#define _APS_NEXT_COMMAND_VALUE         32833
+#define _APS_NEXT_CONTROL_VALUE         1009
 #define _APS_NEXT_SYMED_VALUE           310
 #endif
 #endif

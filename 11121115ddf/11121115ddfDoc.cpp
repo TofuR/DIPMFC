@@ -18,6 +18,7 @@
 #include "CDlgHistogram.h"
 #include "CDlgAdjWindow.h"
 #include "CDlgFilter.h"
+#include "CDlgCutoff.h"
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
@@ -51,6 +52,7 @@ BEGIN_MESSAGE_MAP(CMy11121115ddfDoc, CDocument)
 	ON_COMMAND(ID_AdaptiveMedian, &CMy11121115ddfDoc::OnAdaptivemedian)
 	ON_COMMAND(ID_Degradation, &CMy11121115ddfDoc::OnDegradation)
 	ON_COMMAND(ID_InverseFilter, &CMy11121115ddfDoc::OnInversefilter)
+	ON_COMMAND(ID_WienerFilter, &CMy11121115ddfDoc::OnWienerfilter)
 END_MESSAGE_MAP()
 
 
@@ -492,9 +494,24 @@ void CMy11121115ddfDoc::OnInversefilter()
 	// TODO: 在此添加命令处理程序代码
 	if (m_pDib != NULL)
 	{
+		CDlgCutoff dlg;
 		double k = 0.001;
-		double D0 = 150;
-		m_pDib->InverseFilter(D0, k);
+		if (dlg.DoModal() == IDOK)
+		{
+			m_pDib->InverseFilter(dlg.m_cutoff, k);
+		}
+		UpdateAllViews(NULL);
+	}
+}
+
+
+void CMy11121115ddfDoc::OnWienerfilter()
+{
+	// TODO: 在此添加命令处理程序代码
+	if (m_pDib != NULL)
+	{
+		double k = 0.001;
+		m_pDib->WienerFilter(k);
 		UpdateAllViews(NULL);
 	}
 }

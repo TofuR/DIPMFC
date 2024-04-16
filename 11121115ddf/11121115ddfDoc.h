@@ -75,4 +75,5 @@ public:
 	afx_msg void OnAdaptivemedian();
 	afx_msg void OnDegradation();
 	afx_msg void OnInversefilter();
+	afx_msg void OnWienerfilter();
 };

@@ -191,6 +191,7 @@
     <ClInclude Include="11121115ddfDoc.h" />
     <ClInclude Include="11121115ddfView.h" />
     <ClInclude Include="CDlgAdjWindow.h" />
+    <ClInclude Include="CDlgCutoff.h" />
     <ClInclude Include="CDlgFilter.h" />
     <ClInclude Include="CDlgHistogram.h" />
     <ClInclude Include="Dib.h" />
@@ -206,6 +207,7 @@
     <ClCompile Include="11121115ddfDoc.cpp" />
     <ClCompile Include="11121115ddfView.cpp" />
     <ClCompile Include="CDlgAdjWindow.cpp" />
+    <ClCompile Include="CDlgCutoff.cpp" />
     <ClCompile Include="CDlgFilter.cpp" />
     <ClCompile Include="CDlgHistogram.cpp" />
     <ClCompile Include="Dib.cpp" />

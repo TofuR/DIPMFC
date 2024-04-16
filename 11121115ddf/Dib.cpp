@@ -479,9 +479,33 @@ vector<vector<double>> CDib::InverseFilter(double D0, double k)
 	}
 	CFData = ::ApplyFilter(CFData, Filter);	// 对频域数据进行滤波
 	CTData = ::IFFT(CFData);	// 对滤波后的频域数据进行傅里叶反变换
-	vector<vector<double>> pDibBits2D_De = Complex2Double(CTData);	// 将复数二维数组转换为二维数组
-	Read(pDibBits2D_De);	// 将二维数组写入图像
-	return pDibBits2D_De;	// 返回二维数组，增加代码之后的复用性
+	vector<vector<double>> pDibBits2D_F = Complex2Double(CTData);	// 将复数二维数组转换为二维数组
+	Read(pDibBits2D_F);	// 将二维数组写入图像
+	return pDibBits2D_F;	// 返回二维数组，增加代码之后的复用性
+}
+
+vector<vector<double>> CDib::WienerFilter(double k)
+{
+	vector<vector<double>> pDibBits2D = Tovector();
+	vector<vector<complex<double>>> CTData = Double2Complex(pDibBits2D);
+	vector<vector<complex<double>>> CFData = ::FFT(CTData);
+	vector<vector<double>> H(m_nHeight, vector<double>(m_nWidth, 0));
+	vector<vector<double>> W(m_nHeight, vector<double>(m_nWidth, 0));
+	for (int i = 0; i < m_nHeight; i++) {
+		for (int j = 0; j < m_nWidth; j++) {
+			H[i][j] = pow(Ei, -k * pow((pow(i - m_nHeight / 2, 2) + pow(j - m_nWidth / 2, 2)), 5.0 / 6.0));
+		}
+	}
+	for (int i = 0; i < m_nHeight; i++) {
+		for (int j = 0; j < m_nWidth; j++) {
+			W[i][j] = 1.0 / H[i][j] * (H[i][j] * H[i][j] / (H[i][j] * H[i][j] + 0.01));
+		}
+	}
+	CFData = ::ApplyFilter(CFData, W);	// 对频域数据进行滤波
+	CTData = ::IFFT(CFData);
+	vector<vector<double>> pDibBits2D_F = Complex2Double(CTData);
+	Read(pDibBits2D_F);
+	return pDibBits2D_F;
 }
 
 vector<vector<double>> CDib::MedianFilter(int size)
@@ -499,6 +523,8 @@ vector<vector<double>> CDib::AdaptiveMedianFilter(int SizeMax)
 	Read(pDibBits2D_Filter);	// 将二维数组写入图像
 	return pDibBits2D_Filter;	// 返回二维数组，增加代码之后的复用性
 }
+
+
 
 
 // some functions
