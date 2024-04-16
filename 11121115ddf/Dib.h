@@ -4,6 +4,7 @@
 #include <complex>
 #include <vector>
 #include <string>
+#include "Matrix.h"
 using namespace std;
 
 #define  MAX_SIZE 1000
@@ -27,6 +28,9 @@ public:
 	void LoadFile(LPCTSTR lpszPathName);
 	//read raw picture
 	void LoadRawFile(LPCTSTR lpszPathName);
+	void LoadRawFile(istream& data);
+	// 读取包含多张图片的raw文件
+	void LoadRawFile(LPCTSTR lpszPathName, int numImages);
 	void CreateDisplayDib(uint16_t* pRawBuffer, int nWidth, int nHeight, int nBitCount);
 	void CreateWhiteRect(double = 512, double = 512, double = 100, double = 100);
 
@@ -82,7 +86,8 @@ private:
 	unsigned char* m_pDibBits;	// 指向位图数据的指针
 
 private:
-	uint16_t* m_pRawBuffer;
+	uint16_t* m_pRawBuffer;		// 指向16位数据的指针
+	vector<uint16_t*> m_pRawBuffers;	// 指向多张16位数据的指针
 
 private:
 	long* m_pGrayValueCount;

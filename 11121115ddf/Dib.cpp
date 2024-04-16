@@ -54,15 +54,16 @@ CDib::CDib(CDib& Dib)
 
 CDib::~CDib(void) {
 	m_pDibBits = NULL;
-
-	if (m_pRawBuffer != NULL) {
-		delete[] m_pRawBuffer;
-		m_pRawBuffer = NULL;
+	m_pRawBuffer = NULL;
+	// 释放m_pRawBuffers中的所有内存
+	for (auto& p : m_pRawBuffers) {
+		delete[] p;
 	}
 	if (m_pGrayValueCount != NULL) {
 		delete[] m_pGrayValueCount;
 		m_pGrayValueCount = NULL;
 	}
+
 }
 
 
@@ -81,7 +82,7 @@ void CDib::LoadFile(LPCTSTR lpszPathName) {
 		strPathName.Mid(nDotIndex + 1);  // 取出文件名"."以后的内容
 	strExtension.MakeLower();            // 将扩展名转换为小写
 	if (strExtension == _T("raw")) {
-		LoadRawFile(lpszPathName);
+		LoadRawFile(lpszPathName, 313);
 	}
 	else {
 		Load(lpszPathName);
@@ -121,6 +122,58 @@ void CDib::LoadRawFile(LPCTSTR lpszPathName) {
 		m_pRawBuffer[i] =
 			((m_pRawBuffer[i] & 0xff00) >> 8) | ((m_pRawBuffer[i] & 0x00ff) << 8);
 	}
+	CreateDisplayDib(m_pRawBuffer, m_nWidth, m_nHeight, 8);
+}
+
+void CDib::LoadRawFile(istream& data)
+{
+	size_t imageSize = m_nWidth * m_nHeight * sizeof(uint16_t);
+	m_pRawBuffer = new uint16_t[m_nWidth * m_nHeight];
+	memset(m_pRawBuffer, 0, imageSize);
+
+	data.read(reinterpret_cast<char*>(m_pRawBuffer), imageSize);
+	if (data.fail()) {
+		AfxMessageBox(_T("读取文件失败"));
+		return;
+	}
+
+	for (int i = 0; i < m_nWidth * m_nHeight; i++) {
+		m_pRawBuffer[i] =
+			((m_pRawBuffer[i] & 0xff00) >> 8) | ((m_pRawBuffer[i] & 0x00ff) << 8);
+	}
+	m_pRawBuffers.push_back(m_pRawBuffer);
+}
+
+void CDib::LoadRawFile(LPCTSTR lpszPathName, int numImages)
+{
+	m_nWidth = 512;
+	m_nHeight = 512;
+	m_nBitCount = 16;
+	m_nWidthBytes = ((m_nWidth * m_nBitCount + 31) & ~31) / 8;
+	// 打开raw文件
+	std::ifstream file(lpszPathName, std::ios::binary);
+	if (!file.is_open()) {
+		AfxMessageBox(_T("无法打开文件"));
+		return;
+	}
+
+	if (m_pRawBuffer != NULL) {
+		delete[] m_pRawBuffer;
+		m_pRawBuffer = NULL;
+	}
+	if (!m_pRawBuffers.empty()) {
+		for (auto& p : m_pRawBuffers) {
+			delete[] p;
+		}
+		m_pRawBuffers.clear();
+	}
+
+	for (int i = 0; i < numImages; ++i) {
+		LoadRawFile(file);
+	}
+
+	file.close();
+	m_pRawBuffer = m_pRawBuffers[100];
 	CreateDisplayDib(m_pRawBuffer, m_nWidth, m_nHeight, 8);
 }
 

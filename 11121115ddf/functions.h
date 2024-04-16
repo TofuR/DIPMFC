@@ -1,6 +1,7 @@
 #pragma once
 #include <complex>
 #include <vector>
+#include "Matrix.h"
 using namespace std;
 
 #define Pi 3.1415926535897932354626
