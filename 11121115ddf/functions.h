@@ -15,7 +15,13 @@ vector<vector<complex<double>>> Double2Complex(vector<vector<double>> const&);
 
 vector<vector<double>> Complex2Double(vector<vector<complex<double>>> const&);
 
+uint16_t* Matrix2Uint16(RealMatrix const&);
+
 vector<vector<double>> ZeroPadding(vector<vector<double>> const&, int, int);
+
+// 双线性插值
+
+RealMatrix BilinearInterpolation(RealMatrix const&, int newWidth, int newHeight);
 
 // FFT and IFFT
 
@@ -46,3 +52,19 @@ vector<vector<complex<double>>> ApplyFilter(vector<vector<complex<double>>> cons
 vector<vector<double>> MedianFilter(vector<vector<double>> const& Data, int nHeight, int nWidth, int nSize);
 
 vector<vector<double>> AdaptiveMedianFilter(vector<vector<double>> const& Data, int nHeight, int nWidth, int nSizeMax);
+
+// 对ImageSet显示某一个面
+
+RealMatrix Transverse(ImageSet const& imageSet, int num);
+
+RealMatrix Coronal(ImageSet const& imageSet, int num);
+
+RealMatrix Sagittal(ImageSet const& imageSet, int num);
+
+// 对ImageSet显示某一个面，规定长宽，不足则进行双线性插值
+
+RealMatrix Transverse(ImageSet const& imageSet, int num, int newHeight, int newWidth);
+
+RealMatrix Coronal(ImageSet const& imageSet, int num, int newHeight, int newWidth);
+
+RealMatrix Sagittal(ImageSet const& imageSet, int num, int newHeight, int newWidth);

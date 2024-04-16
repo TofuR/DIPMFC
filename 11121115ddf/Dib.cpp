@@ -17,6 +17,7 @@ CDib::CDib(void)
 	m_nWidth = 0;
 	m_nHeight = 0;
 	m_nWidthBytes = 0;
+	m_numImages = 0;
 }
 
 CDib::CDib(CDib& Dib)
@@ -26,7 +27,7 @@ CDib::CDib(CDib& Dib)
 	m_nWidth = 0;
 	m_nHeight = 0;
 	m_nWidthBytes = 0;
-
+	m_numImages = 0;
 	if (&Dib == NULL) {
 		return;
 	}
@@ -36,6 +37,7 @@ CDib::CDib(CDib& Dib)
 	Create(Dib.GetWidth(), Dib.GetHeight(), Dib.GetBPP(), 0);
 	m_nWidth = Dib.m_nWidth;
 	m_nHeight = Dib.m_nHeight;
+	m_numImages = Dib.m_numImages;
 	if (IsIndexed()) {
 		int nColors = Dib.GetMaxColorTableEntries();
 		if (nColors > 0) {
@@ -160,7 +162,7 @@ void CDib::LoadRawFile(LPCTSTR lpszPathName)
 	file.seekg(0, std::ios::end);
 	int totalFileSize = file.tellg();
 	file.seekg(0, std::ios::beg);
-	int numImages = totalFileSize / imageSize;
+	m_numImages = totalFileSize / imageSize;
 
 	if (m_pRawBuffer != NULL) {
 		delete[] m_pRawBuffer;
@@ -173,12 +175,12 @@ void CDib::LoadRawFile(LPCTSTR lpszPathName)
 		m_pRawBuffers.clear();
 	}
 
-	for (int i = 0; i < numImages; ++i) {
+	for (int i = 0; i < m_numImages; ++i) {
 		LoadRawFile(file);
 	}
 
 	file.close();
-	m_pRawBuffer = m_pRawBuffers.front();
+	m_pRawBuffer = m_pRawBuffers[0];
 	CreateDisplayDib(m_pRawBuffer, m_nWidth, m_nHeight, 8);
 }
 
@@ -422,7 +424,22 @@ void CDib::LungWindow(double midpoint, double width) {
 	Window_1(midpoint, width);
 }
 
+void CDib::Show(RealMatrix const& image)
+{
+	m_nWidth = image[0].size();
+	m_nHeight = image.size();
+	if (m_pRawBuffer != NULL)
+		delete[] m_pRawBuffer;
 
+	m_pRawBuffer = Matrix2Uint16(image);
+	for (int i = 0; i < m_nHeight; i++) {
+		for (int j = 0; j < m_nWidth; j++) {
+			*(m_pDibBits + i * m_nWidthBytes + j) =
+				(BYTE)(m_pRawBuffer[i * m_nWidth + j] >> 4);
+			//CreateDisplayDib(m_pRawBuffer, nWidth, nHeight, 8);
+		}
+	}
+}
 // Image Processing in Frequency Domain
 
 vector<vector<double>> CDib::Amplitude()
@@ -634,8 +651,11 @@ vector<vector<double>> CDib::Conv2d(vector<vector<double>> const& kernel,
 
 vector<vector<double>> CDib::Tovector()
 {
+	if (m_pDibBits == nullptr) {
+		return vector<vector<double>>();
+	}
+	Matrix<double> pDibBits2D(m_nHeight, vector<double>(m_nWidthBytes, 0));
 	if (m_nBitCount == 8) {
-		Matrix<double> pDibBits2D(m_nHeight, vector<double>(m_nWidthBytes, 0));
 		for (int i = 0; i < m_nHeight; i++) {
 			for (int j = 0; j < m_nWidthBytes; j++) {
 				pDibBits2D[i][j] = *(m_pDibBits + i * m_nWidthBytes + j);
@@ -645,10 +665,14 @@ vector<vector<double>> CDib::Tovector()
 	}
 }
 
-vector<RealMatrix> CDib::TovectorMatrix()
+ImageSet CDib::TovectorMatrix()
 {
 	// 将m_pRawBuffers读取到vector<Matrix<double>>中
-	vector<RealMatrix> matrix3d;
+	if (m_pDibBits == nullptr)
+	{
+		return ImageSet();
+	}
+	ImageSet matrix3d;
 	for (auto& p : m_pRawBuffers) {
 		RealMatrix matrix(m_nHeight, vector<double>(m_nWidth, 0));
 		for (int i = 0; i < m_nHeight; i++) {

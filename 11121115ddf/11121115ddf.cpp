@@ -146,7 +146,7 @@ class CAboutDlg : public CDialogEx
 public:
 	CAboutDlg() noexcept;
 
-// 对话框数据
+	// 对话框数据
 #ifdef AFX_DESIGN_TIME
 	enum { IDD = IDD_ABOUTBOX };
 #endif
@@ -154,9 +154,11 @@ public:
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 支持
 
-// 实现
+	// 实现
 protected:
 	DECLARE_MESSAGE_MAP()
+public:
+	afx_msg void OnTest();
 };
 
 CAboutDlg::CAboutDlg() noexcept : CDialogEx(IDD_ABOUTBOX)
@@ -169,6 +171,7 @@ void CAboutDlg::DoDataExchange(CDataExchange* pDX)
 }
 
 BEGIN_MESSAGE_MAP(CAboutDlg, CDialogEx)
+	ON_COMMAND(ID_TEST, &CAboutDlg::OnTest)
 END_MESSAGE_MAP()
 
 // 用于运行对话框的应用程序命令
@@ -182,3 +185,9 @@ void CMy11121115ddfApp::OnAppAbout()
 
 
 
+
+
+void CAboutDlg::OnTest()
+{
+	// TODO: 在此添加命令处理程序代码
+}

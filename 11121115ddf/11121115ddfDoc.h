@@ -76,4 +76,6 @@ public:
 	afx_msg void OnDegradation();
 	afx_msg void OnInversefilter();
 	afx_msg void OnWienerfilter();
+	afx_msg void OnThreeviews();
+	afx_msg void OnTest1();
 };

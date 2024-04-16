@@ -43,8 +43,14 @@ public:
 	void Laplace();
 	void Gaussian1D(int = 19);	// 一维可分离卷积核卷积高斯滤波
 	void Gaussian2D(int = 19);	// 二维高斯滤波
+
+public:
 	void BoneWindow(double = 140, double = 70);	//显示肺部CT图像骨窗
 	void LungWindow(double = 64, double = 92);	//显示肺部CT图像肺窗
+	void Show(RealMatrix const& image);
+	//RealMatrix Transverse(int num);	// 横截面
+	//RealMatrix Coronal(int num);	// 冠状面
+	//RealMatrix Sagittal(int num);	// 矢状面
 
 public:
 	vector<vector<double>> Amplitude();
@@ -65,9 +71,9 @@ public:
 	vector<vector<double>> Padding(int, int);	// 填充
 	vector<vector<double>> Conv2d(vector<vector<double>> const&, int = 1, int = 0, int = 0);	// 2D卷积
 	vector<vector<double>> Tovector();	// 将m_pDibBits读取到vector<vector<double>>
-	vector<RealMatrix> TovectorMatrix();	// 将m_pRawBuffers读取到vector<Matrix<double>>
+	ImageSet TovectorMatrix();			// 将m_pRawBuffers读取到vector<Matrix<double>>
 	void Read(vector<vector<unsigned char>> const&);	// 将vector<vector<unsigned char>>读取到m_pDibBits
-	void Read(vector<vector<double>> const&);	// 将vector<vector<double>>读取到m_pDibBits
+	void Read(vector<vector<double>> const&);			// 将vector<vector<double>>读取到m_pDibBits
 	void Window_1(double = 127.5, double = 255);
 
 public:
@@ -87,6 +93,7 @@ private:
 private:
 	uint16_t* m_pRawBuffer;		// 指向16位数据的指针
 	vector<uint16_t*> m_pRawBuffers;	// 指向多张16位数据的指针
+	int m_numImages;	// 图像数量
 
 private:
 	long* m_pGrayValueCount;

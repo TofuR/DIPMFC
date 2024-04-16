@@ -23,7 +23,6 @@
 #define IDC_TXT_SAG                     1011
 #define IDC_SLI_TRA                     1012
 #define IDC_SLI_COR                     1013
-#define IDC_SLIDER3                     1014
 #define IDC_SLI_SAG                     1014
 #define ID_32771                        32771
 #define ID_Invert                       32772
@@ -87,13 +86,20 @@
 #define ID_InverseFilter                32830
 #define ID_32831                        32831
 #define ID_WienerFilter                 32832
+#define ID_32833                        32833
+#define ID_                             32834
+#define ID_ThreeViews                   32835
+#define ID_32836                        32836
+#define ID_TEST                         32837
+#define ID_32838                        32838
+#define ID_TEST1                        32839
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        322
-#define _APS_NEXT_COMMAND_VALUE         32833
+#define _APS_NEXT_COMMAND_VALUE         32840
 #define _APS_NEXT_CONTROL_VALUE         1015
 #define _APS_NEXT_SYMED_VALUE           310
 #endif

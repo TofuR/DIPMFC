@@ -19,6 +19,7 @@
 #include "CDlgAdjWindow.h"
 #include "CDlgFilter.h"
 #include "CDlgCutoff.h"
+#include "CDlgThreeViews.h"
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
@@ -53,6 +54,8 @@ BEGIN_MESSAGE_MAP(CMy11121115ddfDoc, CDocument)
 	ON_COMMAND(ID_Degradation, &CMy11121115ddfDoc::OnDegradation)
 	ON_COMMAND(ID_InverseFilter, &CMy11121115ddfDoc::OnInversefilter)
 	ON_COMMAND(ID_WienerFilter, &CMy11121115ddfDoc::OnWienerfilter)
+	ON_COMMAND(ID_ThreeViews, &CMy11121115ddfDoc::OnThreeviews)
+	ON_COMMAND(ID_TEST1, &CMy11121115ddfDoc::OnTest1)
 END_MESSAGE_MAP()
 
 
@@ -512,6 +515,28 @@ void CMy11121115ddfDoc::OnWienerfilter()
 	{
 		double k = 0.001;
 		m_pDib->WienerFilter(k);
+		UpdateAllViews(NULL);
+	}
+}
+
+
+void CMy11121115ddfDoc::OnThreeviews()
+{
+	// TODO: 在此添加命令处理程序代码
+	if (m_pDib != NULL)
+	{
+		CDlgThreeViews dlg(m_pDib);
+		dlg.DoModal();
+	}
+}
+
+
+void CMy11121115ddfDoc::OnTest1()
+{
+	// TODO: 在此添加命令处理程序代码
+	if (m_pDib != NULL)
+	{
+		m_pDib->TovectorMatrix();
 		UpdateAllViews(NULL);
 	}
 }

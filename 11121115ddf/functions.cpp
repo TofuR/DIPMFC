@@ -38,6 +38,19 @@ vector<vector<double>> Complex2Double(vector<vector<complex<double>>> const& inp
 	return output;
 }
 
+uint16_t* Matrix2Uint16(RealMatrix const& matrix)
+{
+	int rows = matrix.size();
+	int cols = matrix[0].size();
+	uint16_t* result = new uint16_t[rows * cols];
+	for (int i = 0; i < rows; i++) {
+		for (int j = 0; j < cols; j++) {
+			result[i * cols + j] = matrix[i][j];
+		}
+	}
+	return result;
+}
+
 vector<vector<double>> ZeroPadding(vector<vector<double>> const& Data, int a, int b)
 {
 	int rows = Data.size();
@@ -49,6 +62,44 @@ vector<vector<double>> ZeroPadding(vector<vector<double>> const& Data, int a, in
 		}
 	}
 	return result;
+}
+
+RealMatrix BilinearInterpolation(RealMatrix const& matrix, int newHeight, int newWidth)
+{
+	int oldHeight = matrix.size();
+	int oldWidth = matrix[0].size();
+
+	// 创建一个新的图片矩阵，用于存储插值后的结果
+	RealMatrix interpolatedImage(newHeight, std::vector<double>(newWidth, 0.0));
+
+	// 计算水平和垂直的插值比例
+	double x_ratio = (double)(oldWidth - 1) / (double)(newWidth - 1);
+	double y_ratio = (double)(oldHeight - 1) / (double)(newHeight - 1);
+	if (x_ratio == 1 && y_ratio == 1)
+	{
+		return matrix;
+	}
+
+	// 对新图片的每个像素进行双线性插值
+	for (int y = 0; y < newHeight - 1; ++y) {
+		for (int x = 0; x < newWidth - 1; ++x) {
+			// 计算在原始图片中对应的位置
+			double x_ori = x * x_ratio;
+			double y_ori = y * y_ratio;
+			int x_int = (int)x_ori;
+			int y_int = (int)y_ori;
+			double x_frac = x_ori - x_int;
+			double y_frac = y_ori - y_int;
+
+			// 执行双线性插值
+			interpolatedImage[y][x] =
+				(1 - x_frac) * (1 - y_frac) * matrix[y_int][x_int] +
+				x_frac * (1 - y_frac) * matrix[y_int][x_int + 1] +
+				(1 - x_frac) * y_frac * matrix[y_int + 1][x_int] +
+				x_frac * y_frac * matrix[y_int + 1][x_int + 1];
+		}
+	}
+	return interpolatedImage;
 }
 
 vector<vector<complex<double>>> FFT(vector<vector<complex<double>>> const& CTData)
@@ -313,6 +364,67 @@ vector<vector<double>> AdaptiveMedianFilter(vector<vector<double>> const& Data, 
 	}
 	return result;
 }
+
+RealMatrix Transverse(ImageSet const& imageSet, int num)
+{
+	if (num < 0) num = 0;
+	if (num >= imageSet.size()) num = imageSet.size() - 1;
+	int rows = imageSet[0].size();
+	int cols = imageSet[0][0].size();
+	RealMatrix result(rows, std::vector<double>(cols, 0.0));
+	for (int i = 0; i < rows; i++) {
+		for (int j = 0; j < cols; j++) {
+			result[i][j] = imageSet[num][i][j];
+		}
+	}
+	return result;
+}
+
+RealMatrix Coronal(ImageSet const& imageSet, int num)
+{
+	if (num < 0) num = 0;
+	if (num >= imageSet[0].size()) num = imageSet[0].size() - 1;
+	int rows = imageSet.size();
+	int cols = imageSet[0][0].size();
+	RealMatrix result(rows, std::vector<double>(cols, 0.0));
+	for (int i = 0; i < rows; i++) {
+		for (int j = 0; j < cols; j++) {
+			result[i][j] = imageSet[i][num][j];
+		}
+	}
+	return result;
+}
+
+RealMatrix Sagittal(ImageSet const& imageSet, int num)
+{
+	if (num < 0) num = 0;
+	if (num >= imageSet[0][0].size()) num = imageSet[0][0].size() - 1;
+	int rows = imageSet.size();
+	int cols = imageSet[0].size();
+	RealMatrix result(rows, std::vector<double>(cols, 0.0));
+	for (int i = 0; i < rows; i++) {
+		for (int j = 0; j < cols; j++) {
+			result[i][j] = imageSet[i][j][num];
+		}
+	}
+	return result;
+}
+
+RealMatrix Transverse(ImageSet const& imageSet, int num, int newHeight, int newWidth)
+{
+	return BilinearInterpolation(Transverse(imageSet, num), newHeight, newWidth);
+}
+
+RealMatrix Coronal(ImageSet const& imageSet, int num, int newHeight, int newWidth)
+{
+	return BilinearInterpolation(Coronal(imageSet, num), newHeight, newWidth);
+}
+
+RealMatrix Sagittal(ImageSet const& imageSet, int num, int newHeight, int newWidth)
+{
+	return BilinearInterpolation(Sagittal(imageSet, num), newHeight, newWidth);
+}
+
 
 
 
