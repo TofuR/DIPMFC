@@ -56,6 +56,7 @@ BEGIN_MESSAGE_MAP(CMy11121115ddfDoc, CDocument)
 	ON_COMMAND(ID_WienerFilter, &CMy11121115ddfDoc::OnWienerfilter)
 	ON_COMMAND(ID_ThreeViews, &CMy11121115ddfDoc::OnThreeviews)
 	ON_COMMAND(ID_TEST1, &CMy11121115ddfDoc::OnTest1)
+	ON_COMMAND(ID_LENAPSNR, &CMy11121115ddfDoc::OnLenapsnr)
 END_MESSAGE_MAP()
 
 
@@ -317,7 +318,7 @@ void CMy11121115ddfDoc::OnGaussian1D()
 	{
 		DWORD t1, t2;
 		t1 = GetTickCount64();
-		m_pDib->Gaussian1D();
+		m_pDib->Gaussian1D(7);
 		UpdateAllViews(NULL);
 		t2 = GetTickCount64();
 		CString str;
@@ -536,7 +537,32 @@ void CMy11121115ddfDoc::OnTest1()
 	// TODO: 在此添加命令处理程序代码
 	if (m_pDib != NULL)
 	{
-		m_pDib->TovectorMatrix();
+		m_pDib->BilateralFilter(7, 20, 30);
 		UpdateAllViews(NULL);
+	}
+}
+
+
+void CMy11121115ddfDoc::OnLenapsnr()
+{
+	// TODO: 在此添加命令处理程序代码
+	// 创建一个临时CDib对象读取原始图像
+	if (m_pDib != NULL)
+	{
+		CDib* pDib = new CDib;
+		pDib->LoadFile(L"lena.bmp");
+
+		m_pDib->Smoothing();
+		m_pDib->BilateralFilter(7, 20, 30);
+		UpdateAllViews(NULL);
+
+		// 计算PSNR
+		double psnr = m_pDib->PSNR(pDib->Tovector());
+		CString str;
+		str.Format(_T("PSNR:%f"), psnr);
+		AfxMessageBox(str, MB_OK | MB_ICONINFORMATION, 0);
+
+		// 释放内存.
+		delete pDib;
 	}
 }

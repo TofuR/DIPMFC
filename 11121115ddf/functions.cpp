@@ -365,6 +365,37 @@ vector<vector<double>> AdaptiveMedianFilter(vector<vector<double>> const& Data, 
 	return result;
 }
 
+RealMatrix BilateralFilter(RealMatrix const& input, int diameter, double sigmaDistance, double sigmaIntensity)
+{
+
+	int rows = input.size();
+	int cols = input[0].size();
+	//RealMatrix inputZeroPadding = ZeroPadding(input, diameter / 2, diameter / 2);
+	RealMatrix inputZeroPadding = input;
+	RealMatrix output(rows, std::vector<double>(cols, 0.0));
+	for (int i = 0; i < rows; i++) {
+		for (int j = 0; j < cols; j++) {
+			double sum = 0;
+			double weightSum = 0;
+			for (int m = -diameter / 2; m <= diameter / 2; m++) {
+				for (int n = -diameter / 2; n <= diameter / 2; n++) {
+					int x = i + m;
+					int y = j + n;
+					if (x >= 0 && x < rows && y >= 0 && y < cols) {
+						double distance = sqrt(pow(m, 2) + pow(n, 2));
+						double intensity = abs(inputZeroPadding[i][j] - inputZeroPadding[x][y]);
+						double weight = exp(-pow(distance, 2) / (2 * pow(sigmaDistance, 2)) - pow(intensity, 2) / (2 * pow(sigmaIntensity, 2)));
+						sum += inputZeroPadding[x][y] * weight;
+						weightSum += weight;
+					}
+				}
+			}
+			output[i][j] = sum / weightSum;
+		}
+	}
+	return output;
+}
+
 RealMatrix Transverse(ImageSet const& imageSet, int num)
 {
 	if (num < 0) num = 0;

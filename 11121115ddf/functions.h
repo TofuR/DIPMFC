@@ -53,6 +53,8 @@ vector<vector<double>> MedianFilter(vector<vector<double>> const& Data, int nHei
 
 vector<vector<double>> AdaptiveMedianFilter(vector<vector<double>> const& Data, int nHeight, int nWidth, int nSizeMax);
 
+RealMatrix BilateralFilter(RealMatrix const& input, int diameter, double sigmaDistance, double sigmaIntensity);
+
 // 对ImageSet显示某一个面
 
 RealMatrix Transverse(ImageSet const& imageSet, int num);

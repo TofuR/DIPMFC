@@ -63,6 +63,7 @@ public:
 	vector<vector<double>> WienerFilter(double k);	// 维纳滤波
 	vector<vector<double>> MedianFilter(int = 3);	// 中值滤波
 	vector<vector<double>> AdaptiveMedianFilter(int = 19);	// 均值滤波
+	RealMatrix BilateralFilter(int diameter, double sigmaDistance, double sigmaIntensity);
 
 
 public:
@@ -75,6 +76,7 @@ public:
 	void Read(vector<vector<unsigned char>> const&);	// 将vector<vector<unsigned char>>读取到m_pDibBits
 	void Read(vector<vector<double>> const&);			// 将vector<vector<double>>读取到m_pDibBits
 	void Window_1(double = 127.5, double = 255);
+	double PSNR(RealMatrix const& OriImage);
 
 public:
 	BOOL FFT(unsigned char*, long, long);

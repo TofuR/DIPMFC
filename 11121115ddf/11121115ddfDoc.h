@@ -78,4 +78,5 @@ public:
 	afx_msg void OnWienerfilter();
 	afx_msg void OnThreeviews();
 	afx_msg void OnTest1();
+	afx_msg void OnLenapsnr();
 };

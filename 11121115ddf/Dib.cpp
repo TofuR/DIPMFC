@@ -356,7 +356,7 @@ void CDib::Sobel() {
 void CDib::Laplace() {
 	vector<vector<double>> Laplace_Kernel =
 		vector<vector<double>>(3, vector<double>(3, -1));
-	Laplace_Kernel[1][1] = 8;
+	Laplace_Kernel[1][1] = 9;
 	vector<vector<double>> pDibBits2D = Conv2d(Laplace_Kernel, 1, 1, 1);
 	Read(pDibBits2D);
 }
@@ -366,7 +366,7 @@ void CDib::Gaussian1D(int kernel_size) {
 		vector<vector<double>>(1, vector<double>(kernel_size, 0));
 	vector<vector<double>> Gaussian_Kernel_Y =
 		vector<vector<double>>(kernel_size, vector<double>(1, 0));
-	double sigma = 3.0;
+	double sigma = (kernel_size - 1) / 3;
 	double sum = 0.0;
 	for (int i = 0; i < kernel_size; i++) {
 		Gaussian_Kernel_X[0][i] =
@@ -394,7 +394,7 @@ void CDib::Gaussian1D(int kernel_size) {
 void CDib::Gaussian2D(int kernel_size) {
 	vector<vector<double>> Gaussian_Kernel =
 		vector<vector<double>>(kernel_size, vector<double>(kernel_size, 0));
-	double sigma = 3.0;
+	double sigma = (kernel_size - 1) / 3;
 	double sum = 0.0;
 	for (int i = 0; i < kernel_size; i++) {
 		for (int j = 0; j < kernel_size; j++) {
@@ -599,6 +599,14 @@ vector<vector<double>> CDib::AdaptiveMedianFilter(int SizeMax)
 	return pDibBits2D_Filter;	// 返回二维数组，增加代码之后的复用性
 }
 
+RealMatrix CDib::BilateralFilter(int diameter, double sigmaDistance, double sigmaIntensity)
+{
+	vector<vector<double>> pDibBits2D = Tovector();
+	vector<vector<double>> pDibBits2D_Filter = ::BilateralFilter(pDibBits2D, diameter, sigmaDistance, sigmaIntensity);
+	Read(pDibBits2D_Filter);
+	return pDibBits2D_Filter;
+}
+
 
 
 
@@ -731,6 +739,20 @@ void CDib::Window_1(double level, double width) {
 	}
 	SetColorTable(0, nColors, pColorTable);
 	delete[] pColorTable;
+}
+
+double CDib::PSNR(RealMatrix const& OriImage)
+{
+	// 计算PSNR
+	double sum = 0;
+	for (int i = 0; i < m_nHeight; i++) {
+		for (int j = 0; j < m_nWidth; j++) {
+			sum += pow(OriImage[i][j] - m_pDibBits[i * m_nWidth + j], 2);
+		}
+	}
+	double mse = sum / (m_nHeight * m_nWidth);
+	double psnr = 10 * log10(255 * 255 / mse);
+	return psnr;
 }
 
 
