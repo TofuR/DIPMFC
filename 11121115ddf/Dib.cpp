@@ -331,18 +331,18 @@ void CDib::Histogram_Equalization() {
 }
 
 void CDib::Smoothing() {
-	vector<vector<double>> Smoth_Kernel =
-		vector<vector<double>>(3, vector<double>(3, 1.0 / 9));
-	vector<vector<double>> pDibBits2D = Conv2d(Smoth_Kernel, 1, 1, 1);
+	Matrix<double> Smoth_Kernel =
+		Matrix<double>(3, vector<double>(3, 1.0 / 9));
+	Matrix<double> pDibBits2D = Conv2d(Smoth_Kernel, 1, 1, 1);
 	Read(pDibBits2D);
 }
 
 void CDib::Sobel() {
-	vector<vector<double>> Sobel_Kernel_X = { {1, 2, 1}, {0, 0, 0}, {-1, -2, -1} };
-	vector<vector<double>> Sobel_Kernel_Y = { {-1, 0, 1}, {-2, 0, 2}, {-1, 0, 1} };
-	vector<vector<double>> pDibBits2D_X = Conv2d(Sobel_Kernel_X, 1, 1, 1);
-	vector<vector<double>> pDibBits2D_Y = Conv2d(Sobel_Kernel_Y, 1, 1, 1);
-	vector<vector<double>> pDibBits2D(m_nHeight,
+	Matrix<double> Sobel_Kernel_X = { {1, 2, 1}, {0, 0, 0}, {-1, -2, -1} };
+	Matrix<double> Sobel_Kernel_Y = { {-1, 0, 1}, {-2, 0, 2}, {-1, 0, 1} };
+	Matrix<double> pDibBits2D_X = Conv2d(Sobel_Kernel_X, 1, 1, 1);
+	Matrix<double> pDibBits2D_Y = Conv2d(Sobel_Kernel_Y, 1, 1, 1);
+	Matrix<double> pDibBits2D(m_nHeight,
 		vector<double>(m_nWidthBytes, 0));
 	for (int i = 0; i < m_nHeight; i++) {
 		for (int j = 0; j < m_nWidthBytes; j++) {
@@ -354,18 +354,18 @@ void CDib::Sobel() {
 }
 
 void CDib::Laplace() {
-	vector<vector<double>> Laplace_Kernel =
-		vector<vector<double>>(3, vector<double>(3, -1));
+	Matrix<double> Laplace_Kernel =
+		Matrix<double>(3, vector<double>(3, -1));
 	Laplace_Kernel[1][1] = 9;
-	vector<vector<double>> pDibBits2D = Conv2d(Laplace_Kernel, 1, 1, 1);
+	Matrix<double> pDibBits2D = Conv2d(Laplace_Kernel, 1, 1, 1);
 	Read(pDibBits2D);
 }
 
 void CDib::Gaussian1D(int kernel_size) {
-	vector<vector<double>> Gaussian_Kernel_X =
-		vector<vector<double>>(1, vector<double>(kernel_size, 0));
-	vector<vector<double>> Gaussian_Kernel_Y =
-		vector<vector<double>>(kernel_size, vector<double>(1, 0));
+	Matrix<double> Gaussian_Kernel_X =
+		Matrix<double>(1, vector<double>(kernel_size, 0));
+	Matrix<double> Gaussian_Kernel_Y =
+		Matrix<double>(kernel_size, vector<double>(1, 0));
 	double sigma = (kernel_size - 1) / 3;
 	double sum = 0.0;
 	for (int i = 0; i < kernel_size; i++) {
@@ -383,17 +383,17 @@ void CDib::Gaussian1D(int kernel_size) {
 		Gaussian_Kernel_X[0][i] /= sum;
 		Gaussian_Kernel_Y[i][0] /= sum;
 	}
-	vector<vector<double>> pDibBits2D_X =
+	Matrix<double> pDibBits2D_X =
 		Conv2d(Gaussian_Kernel_X, 1, 0, kernel_size / 2);
 	Read(pDibBits2D_X);
-	vector<vector<double>> pDibBits2D_Y =
+	Matrix<double> pDibBits2D_Y =
 		Conv2d(Gaussian_Kernel_Y, 1, kernel_size / 2, 0);
 	Read(pDibBits2D_Y);
 }
 
 void CDib::Gaussian2D(int kernel_size) {
-	vector<vector<double>> Gaussian_Kernel =
-		vector<vector<double>>(kernel_size, vector<double>(kernel_size, 0));
+	Matrix<double> Gaussian_Kernel =
+		Matrix<double>(kernel_size, vector<double>(kernel_size, 0));
 	double sigma = (kernel_size - 1) / 3;
 	double sum = 0.0;
 	for (int i = 0; i < kernel_size; i++) {
@@ -411,7 +411,7 @@ void CDib::Gaussian2D(int kernel_size) {
 			Gaussian_Kernel[i][j] /= sum;
 		}
 	}
-	vector<vector<double>> pDibBits2D =
+	Matrix<double> pDibBits2D =
 		Conv2d(Gaussian_Kernel, 1, kernel_size / 2, kernel_size / 2);
 	Read(pDibBits2D);
 }
@@ -424,7 +424,7 @@ void CDib::LungWindow(double midpoint, double width) {
 	Window_1(midpoint, width);
 }
 
-void CDib::Show(RealMatrix const& image)
+void CDib::Show(ImageMatrix const& image)
 {
 	m_nWidth = image[0].size();
 	m_nHeight = image.size();
@@ -442,9 +442,9 @@ void CDib::Show(RealMatrix const& image)
 }
 // Image Processing in Frequency Domain
 
-vector<vector<double>> CDib::Amplitude()
+Matrix<double> CDib::Amplitude()
 {
-	vector<vector<double>> pDibBits2D = Tovector();
+	Matrix<double> pDibBits2D = Tovector();
 	vector<vector<complex<double>>> CTData = Double2Complex(pDibBits2D);
 	vector<vector<complex<double>>> CFData = ::FFT(CTData);
 	// 计算幅度谱
@@ -460,14 +460,14 @@ vector<vector<double>> CDib::Amplitude()
 			CFData[i][j] = CFData[i][j] * r;
 		}
 	}
-	vector<vector<double>> pDibBits2D_Amplitude = Complex2Double(CFData);
+	Matrix<double> pDibBits2D_Amplitude = Complex2Double(CFData);
 	Read(pDibBits2D_Amplitude);
 	return pDibBits2D_Amplitude;
 }
 
-vector<vector<double>> CDib::Phase()
+Matrix<double> CDib::Phase()
 {
-	vector<vector<double>> pDibBits2D = Tovector();
+	Matrix<double> pDibBits2D = Tovector();
 	vector<vector<complex<double>>> CTData = Double2Complex(pDibBits2D);
 	vector<vector<complex<double>>> CFData = ::FFT(CTData);
 	// 计算图像的相位谱
@@ -483,17 +483,17 @@ vector<vector<double>> CDib::Phase()
 			CFData[i][j] = CFData[i][j] * r;
 		}
 	}
-	vector<vector<double>> pDibBits2D_Phase = Complex2Double(CFData);
+	Matrix<double> pDibBits2D_Phase = Complex2Double(CFData);
 	Read(pDibBits2D_Phase);
 	return pDibBits2D_Phase;
 }
 
-vector<vector<double>> CDib::Filter(CString filter, CString type, double D0, int n)
+Matrix<double> CDib::Filter(CString filter, CString type, double D0, int n)
 {
-	vector<vector<double>> pDibBits2D = Tovector();		// 读取图像为二维数组
+	Matrix<double> pDibBits2D = Tovector();		// 读取图像为二维数组
 	vector<vector<complex<double>>> CTData = Double2Complex(pDibBits2D);	// 将二维数组转换为复数二维数组
 	vector<vector<complex<double>>> CFData = ::FFT(CTData);	// 对复数二维数组进行傅里叶变换（重写了对vector操作的FFT函数，在functions.h里面）
-	vector<vector<double>> Filter;	// 滤波器
+	Matrix<double> Filter;	// 滤波器
 	if (filter == "Ideal") {
 		Filter = ::IdealFilter(D0, type, m_nHeight, m_nWidth);
 	}
@@ -504,11 +504,11 @@ vector<vector<double>> CDib::Filter(CString filter, CString type, double D0, int
 		Filter = ::GaussianFilter(D0, type, m_nHeight, m_nWidth);
 	}
 	else {
-		return vector<vector<double>>();
+		return Matrix<double>();
 	}
 	CFData = ::ApplyFilter(CFData, Filter);	// 对频域数据进行滤波
 	CTData = ::IFFT(CFData);	// 对滤波后的频域数据进行傅里叶反变换
-	vector<vector<double>> pDibBits2D_Filter = Complex2Double(CTData);	// 将复数二维数组转换为二维数组
+	Matrix<double> pDibBits2D_Filter = Complex2Double(CTData);	// 将复数二维数组转换为二维数组
 	Read(pDibBits2D_Filter);	// 将二维数组写入图像
 	return pDibBits2D_Filter;	// 返回二维数组，增加代码之后的复用性
 }
@@ -516,11 +516,11 @@ vector<vector<double>> CDib::Filter(CString filter, CString type, double D0, int
 
 // Image Restoration
 
-vector<vector<double>> CDib::HufnagelDegration(double k)
+Matrix<double> CDib::HufnagelDegration(double k)
 {
-	vector<vector<double>> pDibBits2D = Tovector();	// 读取图像为二维数组
+	Matrix<double> pDibBits2D = Tovector();	// 读取图像为二维数组
 	// 对二维数组进行Hufnagel退化
-	vector<vector<double>> H(m_nHeight, vector<double>(m_nWidth, 0));
+	Matrix<double> H(m_nHeight, vector<double>(m_nWidth, 0));
 	// 计算Hufnagel and Stanley[1964]退化滤波器
 	for (int i = 0; i < m_nHeight; i++) {
 		for (int j = 0; j < m_nWidth; j++) {
@@ -531,17 +531,17 @@ vector<vector<double>> CDib::HufnagelDegration(double k)
 	vector<vector<complex<double>>> Filter = Double2Complex(H);
 	// 对频域数据与Hufnagel退化滤波器进行卷积
 	CFData = ::ApplyFilter(CFData, Complex2Double(Filter));
-	vector<vector<double>> pDibBits2D_De = Complex2Double(::IFFT(CFData));
+	Matrix<double> pDibBits2D_De = Complex2Double(::IFFT(CFData));
 	Read(pDibBits2D_De);	// 将二维数组写入图像
 	return pDibBits2D_De;	// 返回二维数组，增加代码之后的复用性
 }
 
-vector<vector<double>> CDib::InverseFilter(double D0, double k)
+Matrix<double> CDib::InverseFilter(double D0, double k)
 {
-	vector<vector<double>> pDibBits2D = Tovector();	// 读取图像为二维数组
+	Matrix<double> pDibBits2D = Tovector();	// 读取图像为二维数组
 	vector<vector<complex<double>>> CTData = Double2Complex(pDibBits2D);	// 将二维数组转换为复数二维数组
 	vector<vector<complex<double>>> CFData = ::FFT(CTData);	// 对复数二维数组进行傅里叶变换（重写了对vector操作的FFT函数，在functions.h里面）
-	vector<vector<double>> Filter(m_nHeight, vector<double>(m_nWidth, 0));
+	Matrix<double> Filter(m_nHeight, vector<double>(m_nWidth, 0));
 	for (int i = 0; i < m_nHeight; i++) {
 		for (int j = 0; j < m_nWidth; j++) {
 			if (sqrt(pow(i - m_nHeight / 2, 2) + pow(j - m_nWidth / 2, 2)) <= D0) {
@@ -554,18 +554,18 @@ vector<vector<double>> CDib::InverseFilter(double D0, double k)
 	}
 	CFData = ::ApplyFilter(CFData, Filter);	// 对频域数据进行滤波
 	CTData = ::IFFT(CFData);	// 对滤波后的频域数据进行傅里叶反变换
-	vector<vector<double>> pDibBits2D_F = Complex2Double(CTData);	// 将复数二维数组转换为二维数组
+	Matrix<double> pDibBits2D_F = Complex2Double(CTData);	// 将复数二维数组转换为二维数组
 	Read(pDibBits2D_F);	// 将二维数组写入图像
 	return pDibBits2D_F;	// 返回二维数组，增加代码之后的复用性
 }
 
-vector<vector<double>> CDib::WienerFilter(double k)
+Matrix<double> CDib::WienerFilter(double k)
 {
-	vector<vector<double>> pDibBits2D = Tovector();
+	Matrix<double> pDibBits2D = Tovector();
 	vector<vector<complex<double>>> CTData = Double2Complex(pDibBits2D);
 	vector<vector<complex<double>>> CFData = ::FFT(CTData);
-	vector<vector<double>> H(m_nHeight, vector<double>(m_nWidth, 0));
-	vector<vector<double>> W(m_nHeight, vector<double>(m_nWidth, 0));
+	Matrix<double> H(m_nHeight, vector<double>(m_nWidth, 0));
+	Matrix<double> W(m_nHeight, vector<double>(m_nWidth, 0));
 	for (int i = 0; i < m_nHeight; i++) {
 		for (int j = 0; j < m_nWidth; j++) {
 			H[i][j] = pow(Ei, -k * pow((pow(i - m_nHeight / 2, 2) + pow(j - m_nWidth / 2, 2)), 5.0 / 6.0));
@@ -578,31 +578,31 @@ vector<vector<double>> CDib::WienerFilter(double k)
 	}
 	CFData = ::ApplyFilter(CFData, W);	// 对频域数据进行滤波
 	CTData = ::IFFT(CFData);
-	vector<vector<double>> pDibBits2D_F = Complex2Double(CTData);
+	Matrix<double> pDibBits2D_F = Complex2Double(CTData);
 	Read(pDibBits2D_F);
 	return pDibBits2D_F;
 }
 
-vector<vector<double>> CDib::MedianFilter(int size)
+Matrix<double> CDib::MedianFilter(int size)
 {
-	vector<vector<double>> pDibBits2D = Tovector();	// 读取图像为二维数组
-	vector<vector<double>> pDibBits2D_Filter = ::MedianFilter(pDibBits2D, m_nHeight, m_nWidth, size);	// 对二维数组进行中值滤波
+	Matrix<double> pDibBits2D = Tovector();	// 读取图像为二维数组
+	Matrix<double> pDibBits2D_Filter = ::MedianFilter(pDibBits2D, m_nHeight, m_nWidth, size);	// 对二维数组进行中值滤波
 	Read(pDibBits2D_Filter);	// 将二维数组写入图像
 	return pDibBits2D_Filter;	// 返回二维数组，增加代码之后的复用性
 }
 
-vector<vector<double>> CDib::AdaptiveMedianFilter(int SizeMax)
+Matrix<double> CDib::AdaptiveMedianFilter(int SizeMax)
 {
-	vector<vector<double>> pDibBits2D = Tovector();	// 读取图像为二维数组
-	vector<vector<double>> pDibBits2D_Filter = ::AdaptiveMedianFilter(pDibBits2D, m_nHeight, m_nWidth, SizeMax);	// 对二维数组进行自适应中值滤波
+	Matrix<double> pDibBits2D = Tovector();	// 读取图像为二维数组
+	Matrix<double> pDibBits2D_Filter = ::AdaptiveMedianFilter(pDibBits2D, m_nHeight, m_nWidth, SizeMax);	// 对二维数组进行自适应中值滤波
 	Read(pDibBits2D_Filter);	// 将二维数组写入图像
 	return pDibBits2D_Filter;	// 返回二维数组，增加代码之后的复用性
 }
 
-RealMatrix CDib::BilateralFilter(int diameter, double sigmaDistance, double sigmaIntensity)
+Matrix<double> CDib::BilateralFilter(int diameter, double sigmaDistance, double sigmaIntensity)
 {
-	vector<vector<double>> pDibBits2D = Tovector();
-	vector<vector<double>> pDibBits2D_Filter = ::BilateralFilter(pDibBits2D, diameter, sigmaDistance, sigmaIntensity);
+	Matrix<double> pDibBits2D = Tovector();
+	Matrix<double> pDibBits2D_Filter = ::BilateralFilter(pDibBits2D, diameter, sigmaDistance, sigmaIntensity);
 	Read(pDibBits2D_Filter);
 	return pDibBits2D_Filter;
 }
@@ -627,8 +627,8 @@ long* CDib::GrayValueCount() {
 	return pGrayValueCount;
 }
 
-vector<vector<double>> CDib::Padding(int a, int b) {
-	vector<vector<double>> pDibBits2D(m_nHeight + a * 2,
+Matrix<double> CDib::Padding(int a, int b) {
+	Matrix<double> pDibBits2D(m_nHeight + a * 2,
 		vector<double>(m_nWidthBytes + b * 2, 0));
 	for (int i = 0; i < m_nHeight; i++) {
 		for (int j = 0; j < m_nWidthBytes; j++) {
@@ -638,10 +638,10 @@ vector<vector<double>> CDib::Padding(int a, int b) {
 	return pDibBits2D;
 }
 
-vector<vector<double>> CDib::Conv2d(vector<vector<double>> const& kernel,
+Matrix<double> CDib::Conv2d(Matrix<double> const& kernel,
 	int stride, int h_padding, int w_padding) {
-	vector<vector<double>> temp = Padding(h_padding, w_padding);
-	vector<vector<double>> pDibBits2D(m_nHeight,
+	Matrix<double> temp = Padding(h_padding, w_padding);
+	Matrix<double> pDibBits2D(m_nHeight,
 		vector<double>(m_nWidthBytes, 0));
 	for (int i = 0; i < m_nHeight; i += stride) {
 		for (int j = 0; j < m_nWidthBytes; j += stride) {
@@ -657,10 +657,10 @@ vector<vector<double>> CDib::Conv2d(vector<vector<double>> const& kernel,
 	return pDibBits2D;
 }
 
-vector<vector<double>> CDib::Tovector()
+Matrix<double> CDib::Tovector()
 {
 	if (m_pDibBits == nullptr) {
-		return vector<vector<double>>();
+		return Matrix<double>();
 	}
 	Matrix<double> pDibBits2D(m_nHeight, vector<double>(m_nWidthBytes, 0));
 	if (m_nBitCount == 8) {
@@ -682,7 +682,7 @@ ImageSet CDib::TovectorMatrix()
 	}
 	ImageSet matrix3d;
 	for (auto& p : m_pRawBuffers) {
-		RealMatrix matrix(m_nHeight, vector<double>(m_nWidth, 0));
+		Matrix<double> matrix(m_nHeight, vector<double>(m_nWidth, 0));
 		for (int i = 0; i < m_nHeight; i++) {
 			for (int j = 0; j < m_nWidth; j++) {
 				matrix[i][j] = p[i * m_nWidth + j];
@@ -701,7 +701,7 @@ void CDib::Read(vector<vector<unsigned char>> const& pDibBits2D) {
 	}
 }
 
-void CDib::Read(vector<vector<double>> const& pDibBits2D) {
+void CDib::Read(Matrix<double> const& pDibBits2D) {
 	for (int i = 0; i < m_nHeight; i++) {
 		for (int j = 0; j < m_nWidthBytes; j++) {
 			double tmp = pDibBits2D[i][j];
@@ -741,7 +741,7 @@ void CDib::Window_1(double level, double width) {
 	delete[] pColorTable;
 }
 
-double CDib::PSNR(RealMatrix const& OriImage)
+double CDib::PSNR(Matrix<double> const& OriImage)
 {
 	// 计算PSNR
 	double sum = 0;

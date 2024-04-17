@@ -47,36 +47,36 @@ public:
 public:
 	void BoneWindow(double = 140, double = 70);	//显示肺部CT图像骨窗
 	void LungWindow(double = 64, double = 92);	//显示肺部CT图像肺窗
-	void Show(RealMatrix const& image);
+	void Show(ImageMatrix const& image);
 	//RealMatrix Transverse(int num);	// 横截面
 	//RealMatrix Coronal(int num);	// 冠状面
 	//RealMatrix Sagittal(int num);	// 矢状面
 
 public:
-	vector<vector<double>> Amplitude();
-	vector<vector<double>> Phase();
-	vector<vector<double>> Filter(CString filter, CString type, double D0, int n);
+	Matrix<double> Amplitude();
+	Matrix<double> Phase();
+	Matrix<double> Filter(CString filter, CString type, double D0, int n);
 
 public:
-	vector<vector<double>> HufnagelDegration(double k);
-	vector<vector<double>> InverseFilter(double D0, double k);
-	vector<vector<double>> WienerFilter(double k);	// 维纳滤波
-	vector<vector<double>> MedianFilter(int = 3);	// 中值滤波
-	vector<vector<double>> AdaptiveMedianFilter(int = 19);	// 均值滤波
-	RealMatrix BilateralFilter(int diameter, double sigmaDistance, double sigmaIntensity);
+	Matrix<double> HufnagelDegration(double k);
+	Matrix<double> InverseFilter(double D0, double k);
+	Matrix<double> WienerFilter(double k);	// 维纳滤波
+	Matrix<double> MedianFilter(int = 3);	// 中值滤波
+	Matrix<double> AdaptiveMedianFilter(int = 19);	// 均值滤波
+	Matrix<double> BilateralFilter(int diameter, double sigmaDistance, double sigmaIntensity);
 
 
 public:
 	long* GrayValueCount();	// 获取灰度值统计
 	//unsigned char* Padding(int, int);
-	vector<vector<double>> Padding(int, int);	// 填充
-	vector<vector<double>> Conv2d(vector<vector<double>> const&, int = 1, int = 0, int = 0);	// 2D卷积
-	vector<vector<double>> Tovector();	// 将m_pDibBits读取到vector<vector<double>>
+	Matrix<double> Padding(int, int);	// 填充
+	Matrix<double> Conv2d(Matrix<double> const&, int = 1, int = 0, int = 0);	// 2D卷积
+	Matrix<double> Tovector();	// 将m_pDibBits读取到vector<vector<double>>
 	ImageSet TovectorMatrix();			// 将m_pRawBuffers读取到vector<Matrix<double>>
 	void Read(vector<vector<unsigned char>> const&);	// 将vector<vector<unsigned char>>读取到m_pDibBits
 	void Read(vector<vector<double>> const&);			// 将vector<vector<double>>读取到m_pDibBits
 	void Window_1(double = 127.5, double = 255);
-	double PSNR(RealMatrix const& OriImage);
+	double PSNR(Matrix<double> const& OriImage);
 
 public:
 	BOOL FFT(unsigned char*, long, long);

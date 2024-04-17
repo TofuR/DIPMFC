@@ -3,7 +3,7 @@
 #include <algorithm>
 
 
-double findmax(vector<vector<double>> const& matrix)
+double findmax(Matrix<double> const& matrix)
 {
 	vector<double> temp;
 	for (const auto& row : matrix) {
@@ -12,8 +12,8 @@ double findmax(vector<vector<double>> const& matrix)
 	return *max_element(temp.begin(), temp.end());
 }
 
-vector<vector<complex<double>>> Double2Complex(vector<vector<double>> const& realData) {
-	vector<vector<complex<double>>> complexData;
+ComplexMatrix Double2Complex(Matrix<double> const& realData) {
+	ComplexMatrix complexData;
 	for (const auto& row : realData) {
 		vector<complex<double>> complexRow;
 		for (const auto& value : row) {
@@ -24,8 +24,8 @@ vector<vector<complex<double>>> Double2Complex(vector<vector<double>> const& rea
 	return complexData;
 }
 
-vector<vector<double>> Complex2Double(vector<vector<complex<double>>> const& input) {
-	vector<vector<double>> output;
+Matrix<double> Complex2Double(ComplexMatrix const& input) {
+	Matrix<double> output;
 	// 遍历原始二维向量
 	for (const auto& row : input) {
 		vector<double> doubleRow;
@@ -38,7 +38,7 @@ vector<vector<double>> Complex2Double(vector<vector<complex<double>>> const& inp
 	return output;
 }
 
-uint16_t* Matrix2Uint16(RealMatrix const& matrix)
+uint16_t* Matrix2Uint16(Matrix<double> const& matrix)
 {
 	int rows = matrix.size();
 	int cols = matrix[0].size();
@@ -51,11 +51,11 @@ uint16_t* Matrix2Uint16(RealMatrix const& matrix)
 	return result;
 }
 
-vector<vector<double>> ZeroPadding(vector<vector<double>> const& Data, int a, int b)
+Matrix<double> ZeroPadding(Matrix<double> const& Data, int a, int b)
 {
 	int rows = Data.size();
 	int cols = Data[0].size();
-	vector<vector<double>> result(rows + a * 2, vector<double>(cols + b * 2, 0));
+	Matrix<double> result(rows + a * 2, vector<double>(cols + b * 2, 0));
 	for (int i = a; i < rows + a; i++) {
 		for (int j = b; j < cols + b; j++) {
 			result[i][j] = Data[i - a][j - b];
@@ -64,13 +64,13 @@ vector<vector<double>> ZeroPadding(vector<vector<double>> const& Data, int a, in
 	return result;
 }
 
-RealMatrix BilinearInterpolation(RealMatrix const& matrix, int newHeight, int newWidth)
+Matrix<double> BilinearInterpolation(Matrix<double> const& matrix, int newHeight, int newWidth)
 {
 	int oldHeight = matrix.size();
 	int oldWidth = matrix[0].size();
 
 	// 创建一个新的图片矩阵，用于存储插值后的结果
-	RealMatrix interpolatedImage(newHeight, std::vector<double>(newWidth, 0.0));
+	Matrix<double> interpolatedImage(newHeight, std::vector<double>(newWidth, 0.0));
 
 	// 计算水平和垂直的插值比例
 	double x_ratio = (double)(oldWidth - 1) / (double)(newWidth - 1);
@@ -102,12 +102,12 @@ RealMatrix BilinearInterpolation(RealMatrix const& matrix, int newHeight, int ne
 	return interpolatedImage;
 }
 
-vector<vector<complex<double>>> FFT(vector<vector<complex<double>>> const& CTData)
+ComplexMatrix FFT(ComplexMatrix const& CTData)
 {
 	int rows = CTData.size();
 	int cols = CTData[0].size();
 	// 将原始数据每个元素乘以-1的i+j次方
-	vector<vector<complex<double>>> shift_T(rows, vector<complex<double>>(cols));
+	ComplexMatrix shift_T(rows, vector<complex<double>>(cols));
 	for (int i = 0; i < rows; i++) {
 		for (int j = 0; j < cols; j++) {
 			shift_T[i][j] = CTData[i][j] * pow(-1, i + j);
@@ -116,13 +116,13 @@ vector<vector<complex<double>>> FFT(vector<vector<complex<double>>> const& CTDat
 	return FFT_2D(shift_T);
 }
 
-vector<vector<complex<double>>> IFFT(vector<vector<complex<double>>> const& CFData)
+ComplexMatrix IFFT(ComplexMatrix const& CFData)
 {
 	int rows = CFData.size();
 	int cols = CFData[0].size();
-	vector<vector<complex<double>>> shift_F(rows, vector<complex<double>>(cols));
+	ComplexMatrix shift_F(rows, vector<complex<double>>(cols));
 	// 对频域数据进行IFFT
-	vector<vector<complex<double>>> shift_T = IFFT_2D(CFData);
+	ComplexMatrix shift_T = IFFT_2D(CFData);
 	// 将IFFT结果乘以-1的i+j次方
 	for (int i = 0; i < rows; i++) {
 		for (int j = 0; j < cols; j++) {
@@ -184,19 +184,19 @@ vector<complex<double>> IFFT_1D(vector<complex<double>> const& CFData) {
 	return result;
 }
 
-vector<vector<complex<double>>> FFT_2D(vector<vector<complex<double>>> const& CTData)
+ComplexMatrix FFT_2D(ComplexMatrix const& CTData)
 {
 	int rows = CTData.size();
 	int cols = CTData[0].size();
 
 	// 对行进行FFT
-	vector<vector<complex<double>>> temp(rows, vector<complex<double>>(cols));
+	ComplexMatrix temp(rows, vector<complex<double>>(cols));
 	for (int i = 0; i < rows; ++i) {
 		temp[i] = FFT_1D(CTData[i]);
 	}
 
 	// 对列进行FFT
-	vector<vector<complex<double>>> result(rows, vector<complex<double>>(cols));
+	ComplexMatrix result(rows, vector<complex<double>>(cols));
 	for (int j = 0; j < cols; ++j) {
 		vector<complex<double>> column_data(rows);
 		for (int i = 0; i < rows; ++i) {
@@ -210,14 +210,14 @@ vector<vector<complex<double>>> FFT_2D(vector<vector<complex<double>>> const& CT
 	return result;
 }
 
-vector<vector<complex<double>>> IFFT_2D(vector<vector<complex<double>>> const& CFData) {
+ComplexMatrix IFFT_2D(ComplexMatrix const& CFData) {
 	int rows = CFData.size();
 	int cols = CFData[0].size();
-	vector<vector<complex<double>>> temp(rows, vector<complex<double>>(cols));
+	ComplexMatrix temp(rows, vector<complex<double>>(cols));
 	for (int i = 0; i < rows; ++i) {
 		temp[i] = IFFT_1D(CFData[i]);
 	}
-	vector<vector<complex<double>>> result(rows, vector<complex<double>>(cols));
+	ComplexMatrix result(rows, vector<complex<double>>(cols));
 	for (int j = 0; j < cols; ++j) {
 		vector<complex<double>> column_data(rows);
 		for (int i = 0; i < rows; ++i) {
@@ -231,9 +231,9 @@ vector<vector<complex<double>>> IFFT_2D(vector<vector<complex<double>>> const& C
 	return result;
 }
 
-vector<vector<double>> IdealFilter(double D0, CString type, int nHeight, int nWidth)
+Matrix<double> IdealFilter(double D0, CString type, int nHeight, int nWidth)
 {
-	vector<vector<double>> H(nHeight, vector<double>(nWidth, 0));
+	Matrix<double> H(nHeight, vector<double>(nWidth, 0));
 	int nCenterX = nWidth / 2;
 	int nCenterY = nHeight / 2;
 	for (int i = 0; i < nHeight; i++) {
@@ -254,9 +254,9 @@ vector<vector<double>> IdealFilter(double D0, CString type, int nHeight, int nWi
 	return H;
 }
 
-vector<vector<double>> ButterworthFilter(double D0, CString type, int n, int nHeight, int nWidth)
+Matrix<double> ButterworthFilter(double D0, CString type, int n, int nHeight, int nWidth)
 {
-	vector<vector<double>> H(nHeight, vector<double>(nWidth, 0));
+	Matrix<double> H(nHeight, vector<double>(nWidth, 0));
 	int nCenterX = nWidth / 2;
 	int nCenterY = nHeight / 2;
 	for (int i = 0; i < nHeight; i++) {
@@ -273,9 +273,9 @@ vector<vector<double>> ButterworthFilter(double D0, CString type, int n, int nHe
 	return H;
 }
 
-vector<vector<double>> GaussianFilter(double D0, CString type, int nHeight, int nWidth)
+Matrix<double> GaussianFilter(double D0, CString type, int nHeight, int nWidth)
 {
-	vector<vector<double>> H(nHeight, vector<double>(nWidth, 0));
+	Matrix<double> H(nHeight, vector<double>(nWidth, 0));
 	int nCenterX = nWidth / 2;
 	int nCenterY = nHeight / 2;
 	for (int i = 0; i < nHeight; i++) {
@@ -293,11 +293,11 @@ vector<vector<double>> GaussianFilter(double D0, CString type, int nHeight, int 
 	return H;
 }
 
-vector<vector<complex<double>>> ApplyFilter(vector<vector<complex<double>>> const& CFData, vector<vector<double>> const& FilterData)
+ComplexMatrix ApplyFilter(ComplexMatrix const& CFData, Matrix<double> const& FilterData)
 {
 	int rows = CFData.size();
 	int cols = CFData[0].size();
-	vector<vector<complex<double>>> result(rows, vector<complex<double>>(cols));
+	ComplexMatrix result(rows, vector<complex<double>>(cols));
 	for (int i = 0; i < rows; i++) {
 		for (int j = 0; j < cols; j++) {
 			result[i][j] = CFData[i][j] * FilterData[i][j];
@@ -306,11 +306,11 @@ vector<vector<complex<double>>> ApplyFilter(vector<vector<complex<double>>> cons
 	return result;
 }
 
-vector<vector<double>> MedianFilter(vector<vector<double>> const& Data, int nHeight, int nWidth, int nSize)
+Matrix<double> MedianFilter(Matrix<double> const& Data, int nHeight, int nWidth, int nSize)
 {
 	// 为了方便处理边界，对原始数据进行零填充
-	vector<vector<double>> DataZeroPadding = ZeroPadding(Data, nSize / 2, nSize / 2);
-	vector<vector<double>> result(nHeight, vector<double>(nWidth, 0));
+	Matrix<double> DataZeroPadding = ZeroPadding(Data, nSize / 2, nSize / 2);
+	Matrix<double> result(nHeight, vector<double>(nWidth, 0));
 	for (int i = nSize / 2; i < nHeight + nSize / 2; i++) {
 		for (int j = nSize / 2; j < nWidth + nSize / 2; j++) {
 			vector<double> temp;
@@ -326,11 +326,11 @@ vector<vector<double>> MedianFilter(vector<vector<double>> const& Data, int nHei
 	return result;
 }
 
-vector<vector<double>> AdaptiveMedianFilter(vector<vector<double>> const& Data, int nHeight, int nWidth, int nSizeMax)
+Matrix<double> AdaptiveMedianFilter(Matrix<double> const& Data, int nHeight, int nWidth, int nSizeMax)
 {
 	// 为了方便处理边界，对原始数据进行零填充
-	vector<vector<double>> DataZeroPadding = ZeroPadding(Data, nSizeMax / 2, nSizeMax / 2);
-	vector<vector<double>> result(nHeight, vector<double>(nWidth, 0));
+	Matrix<double> DataZeroPadding = ZeroPadding(Data, nSizeMax / 2, nSizeMax / 2);
+	Matrix<double> result(nHeight, vector<double>(nWidth, 0));
 	for (int i = nSizeMax / 2; i < nHeight + nSizeMax / 2; i++) {
 		for (int j = nSizeMax / 2; j < nWidth + nSizeMax / 2; j++) {
 			int nSize = 3;
@@ -365,14 +365,14 @@ vector<vector<double>> AdaptiveMedianFilter(vector<vector<double>> const& Data, 
 	return result;
 }
 
-RealMatrix BilateralFilter(RealMatrix const& input, int diameter, double sigmaDistance, double sigmaIntensity)
+Matrix<double> BilateralFilter(Matrix<double> const& input, int diameter, double sigmaDistance, double sigmaIntensity)
 {
 
 	int rows = input.size();
 	int cols = input[0].size();
-	//RealMatrix inputZeroPadding = ZeroPadding(input, diameter / 2, diameter / 2);
-	RealMatrix inputZeroPadding = input;
-	RealMatrix output(rows, std::vector<double>(cols, 0.0));
+	//Matrix<double> inputZeroPadding = ZeroPadding(input, diameter / 2, diameter / 2);
+	Matrix<double> inputZeroPadding = input;
+	Matrix<double> output(rows, std::vector<double>(cols, 0.0));
 	for (int i = 0; i < rows; i++) {
 		for (int j = 0; j < cols; j++) {
 			double sum = 0;
@@ -396,13 +396,13 @@ RealMatrix BilateralFilter(RealMatrix const& input, int diameter, double sigmaDi
 	return output;
 }
 
-RealMatrix Transverse(ImageSet const& imageSet, int num)
+Matrix<double> Transverse(ImageSet const& imageSet, int num)
 {
 	if (num < 0) num = 0;
 	if (num >= imageSet.size()) num = imageSet.size() - 1;
 	int rows = imageSet[0].size();
 	int cols = imageSet[0][0].size();
-	RealMatrix result(rows, std::vector<double>(cols, 0.0));
+	Matrix<double> result(rows, std::vector<double>(cols, 0.0));
 	for (int i = 0; i < rows; i++) {
 		for (int j = 0; j < cols; j++) {
 			result[i][j] = imageSet[num][i][j];
@@ -411,13 +411,13 @@ RealMatrix Transverse(ImageSet const& imageSet, int num)
 	return result;
 }
 
-RealMatrix Coronal(ImageSet const& imageSet, int num)
+Matrix<double> Coronal(ImageSet const& imageSet, int num)
 {
 	if (num < 0) num = 0;
 	if (num >= imageSet[0].size()) num = imageSet[0].size() - 1;
 	int rows = imageSet.size();
 	int cols = imageSet[0][0].size();
-	RealMatrix result(rows, std::vector<double>(cols, 0.0));
+	Matrix<double> result(rows, std::vector<double>(cols, 0.0));
 	for (int i = 0; i < rows; i++) {
 		for (int j = 0; j < cols; j++) {
 			result[i][j] = imageSet[i][num][j];
@@ -426,13 +426,13 @@ RealMatrix Coronal(ImageSet const& imageSet, int num)
 	return result;
 }
 
-RealMatrix Sagittal(ImageSet const& imageSet, int num)
+Matrix<double> Sagittal(ImageSet const& imageSet, int num)
 {
 	if (num < 0) num = 0;
 	if (num >= imageSet[0][0].size()) num = imageSet[0][0].size() - 1;
 	int rows = imageSet.size();
 	int cols = imageSet[0].size();
-	RealMatrix result(rows, std::vector<double>(cols, 0.0));
+	Matrix<double> result(rows, std::vector<double>(cols, 0.0));
 	for (int i = 0; i < rows; i++) {
 		for (int j = 0; j < cols; j++) {
 			result[i][j] = imageSet[i][j][num];
@@ -441,17 +441,17 @@ RealMatrix Sagittal(ImageSet const& imageSet, int num)
 	return result;
 }
 
-RealMatrix Transverse(ImageSet const& imageSet, int num, int newHeight, int newWidth)
+Matrix<double> Transverse(ImageSet const& imageSet, int num, int newHeight, int newWidth)
 {
 	return BilinearInterpolation(Transverse(imageSet, num), newHeight, newWidth);
 }
 
-RealMatrix Coronal(ImageSet const& imageSet, int num, int newHeight, int newWidth)
+Matrix<double> Coronal(ImageSet const& imageSet, int num, int newHeight, int newWidth)
 {
 	return BilinearInterpolation(Coronal(imageSet, num), newHeight, newWidth);
 }
 
-RealMatrix Sagittal(ImageSet const& imageSet, int num, int newHeight, int newWidth)
+Matrix<double> Sagittal(ImageSet const& imageSet, int num, int newHeight, int newWidth)
 {
 	return BilinearInterpolation(Sagittal(imageSet, num), newHeight, newWidth);
 }
@@ -461,7 +461,7 @@ RealMatrix Sagittal(ImageSet const& imageSet, int num, int newHeight, int newWid
 
 
 
-//vector<vector<complex<double>>> FFT(vector<vector<complex<double>>> const& CTData, long nWidth, long nHeight) {
+//ComplexMatrix FFT(ComplexMatrix const& CTData, long nWidth, long nHeight) {
 //	unsigned char* lpSrc;      // 指向源图像的指针
 //	int y;                     // 循环控制变量
 //	int x;                     // 循环控制变量
@@ -505,7 +505,7 @@ RealMatrix Sagittal(ImageSet const& imageSet, int num, int newHeight, int newWid
 //	FFT_2D(pCTData, m_nWidth, m_nHeight, pCFData);  // 傅立叶正变换
 //
 //	// 返回频域数据
-//	vector<vector<complex<double>>> pCFData2D(m_nHeight, vector<complex<double>>(m_nWidthBytes, 0));
+//	ComplexMatrix pCFData2D(m_nHeight, vector<complex<double>>(m_nWidthBytes, 0));
 //	for (int i = 0; i < m_nHeight; i++) {
 //		for (int j = 0; j < m_nWidthBytes; j++) {
 //			pCFData2D[i][j] = pCFData[i * nTransWidth + j];
@@ -519,10 +519,10 @@ RealMatrix Sagittal(ImageSet const& imageSet, int num, int newHeight, int newWid
 //}
 
 
-//vector<vector<complex<double>>> CDib::IFFT(vector<vector<complex<double>>> const& CFData)
+//ComplexMatrix CDib::IFFT(ComplexMatrix const& CFData)
 //{
 //	// 使用FFT实现IFFT
-//	vector<vector<complex<double>>> pCTData2D(m_nHeight, vector<complex<double>>(m_nWidthBytes, 0));
+//	ComplexMatrix pCTData2D(m_nHeight, vector<complex<double>>(m_nWidthBytes, 0));
 //	for (int i = 0; i < m_nHeight; i++) {
 //		for (int j = 0; j < m_nWidthBytes; j++) {
 //			pCTData2D[i][j] = freq[i][j];
@@ -532,7 +532,7 @@ RealMatrix Sagittal(ImageSet const& imageSet, int num, int newHeight, int newWid
 //}
 
 
-//vector<vector<double>> CDib::Amplitude()
+//Matrix<double> CDib::Amplitude()
 //{
 	//unsigned char* pDIBBits = m_pDibBits;
 	//long nWidth = m_nWidth;
