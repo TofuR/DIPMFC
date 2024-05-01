@@ -22,7 +22,7 @@ public:
 
 public:
 	enum chan_color { chan_red = 1, chan_green, chan_blue, chan_black };
-	enum HSIChannel { HUE = 0, SATURATION, INTENSITY };
+	enum HSIChannel { HUE = 2, SATURATION = 1, INTENSITY = 0 };
 
 public:
 	void LoadFile(LPCTSTR lpszPathName);
@@ -75,6 +75,8 @@ public:
 	// 将HSI通道通过RGB通道显示
 	void RGB2HSI();
 	void HSI2RGB();
+	// 对HSI通道进行直方图均衡化
+	void HSIHistogramEqualization();
 
 public:
 	long* GrayValueCount();	// 获取灰度值统计

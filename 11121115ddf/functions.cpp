@@ -453,7 +453,7 @@ Matrix<double> RGB2HSI(Matrix<double> const& Data)
 			double R = Data[i][j + 2] / 255.0;
 			double theta = 0;
 			double S = 0;
-			if (R == 0 && G == 0 && B == 0)
+			if (R == G && G == B)
 			{
 				theta = 0;
 				S = 0;
@@ -465,9 +465,9 @@ Matrix<double> RGB2HSI(Matrix<double> const& Data)
 			}
 			double H = B <= G ? theta : 2 * Pi - theta;
 			double I = (R + G + B) / 3;
-			result[i][j] = H * 255.0 / 2 / Pi;
+			result[i][j] = I * 255.0;
 			result[i][j + 1] = S * 255;
-			result[i][j + 2] = I * 255;
+			result[i][j + 2] = H * 255 / 2 / Pi;
 		}
 	}
 	return result;
@@ -482,7 +482,7 @@ Matrix<double> HSI2RGB(Matrix<double> const& Data)
 		for (int j = 0; j < cols; j += 3) {
 			double H = Data[i][j + 2] * 2 * Pi / 255.0;
 			double S = Data[i][j + 1] / 255.0;
-			double I = Data[i][j] / 255.0;
+			double I = Data[i][j + 0] / 255.0;
 			double R = 0;
 			double G = 0;
 			double B = 0;
@@ -515,6 +515,40 @@ Matrix<double> HSI2RGB(Matrix<double> const& Data)
 			result[i][j] = B * 255;
 			result[i][j + 1] = G * 255;
 			result[i][j + 2] = R * 255;
+		}
+	}
+	return result;
+}
+
+Matrix<double> HSIHistogramEqualization(Matrix<double>& Data)
+{
+	int rows = Data.size();
+	int cols = Data[0].size();
+	Matrix<double> result(rows, std::vector<double>(cols, 0.0));
+	// 统计直方图
+	vector<double> S(256, 0);
+	vector<double> I(256, 0);
+	for (int i = 0; i < rows; i++) {
+		for (int j = 0; j < cols; j += 3) {
+			I[Data[i][j + 0]]++;
+		}
+	}
+	// 进行变换
+	for (int i = 0; i < 256; i++) {
+		S[i] = i + 10;
+		if (S[i] > 255)
+			S[i] = 255;
+	}
+	for (int j = 1; j < 256; j++) {
+		I[j] += I[j - 1];
+	}
+
+	// 归一化
+	for (int i = 0; i < rows; i++) {
+		for (int j = 0; j < cols; j += 3) {
+			result[i][j + 2] = Data[i][j + 2];
+			result[i][j + 1] = S[Data[i][j + 1]];
+			result[i][j + 0] = I[Data[i][j + 0]] * 255.0 / (rows * cols / 3);
 		}
 	}
 	return result;

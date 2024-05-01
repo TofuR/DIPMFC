@@ -672,7 +672,7 @@ Matrix<double> CDib::GetHSIChannel(HSIChannel channel)
 	if (channel == HSIChannel::HUE) {
 		for (int i = 0; i < m_nHeight; i++) {
 			for (int j = 0; j < m_nWidth; j++) {
-				Data_Channel[i][j] = Data_HSI[i][j * 3];
+				Data_Channel[i][j] = Data_HSI[i][j * 3 + 2];
 			}
 		}
 	}
@@ -686,7 +686,7 @@ Matrix<double> CDib::GetHSIChannel(HSIChannel channel)
 	else if (channel == HSIChannel::INTENSITY) {
 		for (int i = 0; i < m_nHeight; i++) {
 			for (int j = 0; j < m_nWidth; j++) {
-				Data_Channel[i][j] = Data_HSI[i][j * 3 + 2];
+				Data_Channel[i][j] = Data_HSI[i][j * 3 + 0];
 			}
 		}
 	}
@@ -699,7 +699,7 @@ void CDib::ShowHSIChannel(HSIChannel channel)
 	// 将二维数组写入图像，每个像素的RGB为Data_Channel[i][j]
 	for (int i = 0; i < m_nHeight; i++) {
 		for (int j = 0; j < m_nWidth; j++) {
-			*(m_pDibBits + i * m_nWidthBytes + j * 3) = (unsigned char)(Data_Channel[i][j] + 0.5);
+			*(m_pDibBits + i * m_nWidthBytes + j * 3 + 0) = (unsigned char)(Data_Channel[i][j] + 0.5);
 			*(m_pDibBits + i * m_nWidthBytes + j * 3 + 1) = (unsigned char)(Data_Channel[i][j] + 0.5);
 			*(m_pDibBits + i * m_nWidthBytes + j * 3 + 2) = (unsigned char)(Data_Channel[i][j] + 0.5);
 		}
@@ -713,9 +713,9 @@ void CDib::RGB2HSI()
 	// 将二维数组写入图像，每个像素的RGB为Data_HSI[i][j * 3], Data_HSI[i][j * 3 + 1], Data_HSI[i][j * 3 + 2]
 	for (int i = 0; i < m_nHeight; i++) {
 		for (int j = 0; j < m_nWidth; j++) {
-			*(m_pDibBits + i * m_nWidthBytes + j * 3 + 2) = (unsigned char)(Data_HSI[i][j * 3] + 0.5);
+			*(m_pDibBits + i * m_nWidthBytes + j * 3 + 0) = (unsigned char)(Data_HSI[i][j * 3 + 0] + 0.5);
 			*(m_pDibBits + i * m_nWidthBytes + j * 3 + 1) = (unsigned char)(Data_HSI[i][j * 3 + 1] + 0.5);
-			*(m_pDibBits + i * m_nWidthBytes + j * 3) = (unsigned char)(Data_HSI[i][j * 3 + 2] + 0.5);
+			*(m_pDibBits + i * m_nWidthBytes + j * 3 + 2) = (unsigned char)(Data_HSI[i][j * 3 + 2] + 0.5);
 		}
 	}
 }
@@ -728,6 +728,23 @@ void CDib::HSI2RGB()
 	for (int i = 0; i < m_nHeight; i++) {
 		for (int j = 0; j < m_nWidth; j++) {
 			*(m_pDibBits + i * m_nWidthBytes + j * 3) = (unsigned char)(Data_RGB[i][j * 3] + 0.5);
+			*(m_pDibBits + i * m_nWidthBytes + j * 3 + 1) = (unsigned char)(Data_RGB[i][j * 3 + 1] + 0.5);
+			*(m_pDibBits + i * m_nWidthBytes + j * 3 + 2) = (unsigned char)(Data_RGB[i][j * 3 + 2] + 0.5);
+		}
+	}
+}
+
+void CDib::HSIHistogramEqualization()
+{
+	Matrix<double> Data = Tovector();
+	Matrix<double> Data_HSI = ::RGB2HSI(Data);
+	Matrix<double> Data_HSI_Equalization = ::HSIHistogramEqualization(Data_HSI);
+
+	Matrix<double> Data_RGB = ::HSI2RGB(Data_HSI_Equalization);
+	// 将二维数组写入图像，每个像素的RGB为Data_RGB[i][j * 3], Data_RGB[i][j * 3 + 1], Data_RGB[i][j * 3 + 2]
+	for (int i = 0; i < m_nHeight; i++) {
+		for (int j = 0; j < m_nWidth; j++) {
+			*(m_pDibBits + i * m_nWidthBytes + j * 3) = (unsigned char)(Data_RGB[i][j * 3 + 0] + 0.5);
 			*(m_pDibBits + i * m_nWidthBytes + j * 3 + 1) = (unsigned char)(Data_RGB[i][j * 3 + 1] + 0.5);
 			*(m_pDibBits + i * m_nWidthBytes + j * 3 + 2) = (unsigned char)(Data_RGB[i][j * 3 + 2] + 0.5);
 		}

@@ -70,6 +70,7 @@ Matrix<double> RGB2HSI(Matrix<double> const& Data);
 
 Matrix<double> HSI2RGB(Matrix<double> const& Data);
 
+Matrix<double> HSIHistogramEqualization(Matrix<double>& Data);
 
 // 对ImageSet显示某一个面，规定长宽，不足则进行双线性插值
 

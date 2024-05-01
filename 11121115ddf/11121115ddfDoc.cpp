@@ -63,6 +63,7 @@ BEGIN_MESSAGE_MAP(CMy11121115ddfDoc, CDocument)
 	ON_COMMAND(ID_Intensity, &CMy11121115ddfDoc::OnIntensity)
 	ON_COMMAND(ID_RGB2HSI, &CMy11121115ddfDoc::OnRGB2HSI)
 	ON_COMMAND(ID_HSI2RGB, &CMy11121115ddfDoc::OnHSI2RGB)
+	ON_COMMAND(ID_Color_Histo_Equa, &CMy11121115ddfDoc::OnColorHistoEqua)
 END_MESSAGE_MAP()
 
 
@@ -643,6 +644,17 @@ void CMy11121115ddfDoc::OnHSI2RGB()
 	if (m_pDib != NULL)
 	{
 		m_pDib->HSI2RGB();
+		UpdateAllViews(NULL);
+	}
+}
+
+
+void CMy11121115ddfDoc::OnColorHistoEqua()
+{
+	// TODO: 在此添加命令处理程序代码
+	if (m_pDib != NULL)
+	{
+		m_pDib->HSIHistogramEqualization();
 		UpdateAllViews(NULL);
 	}
 }
