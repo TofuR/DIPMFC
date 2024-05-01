@@ -441,6 +441,85 @@ Matrix<double> Sagittal(ImageSet const& imageSet, int num)
 	return result;
 }
 
+Matrix<double> RGB2HSI(Matrix<double> const& Data)
+{
+	int rows = Data.size();
+	int cols = Data[0].size();
+	Matrix<double> result(rows, std::vector<double>(cols, 0.0));
+	for (int i = 0; i < rows; i++) {
+		for (int j = 0; j < cols; j += 3) {
+			double B = Data[i][j] / 255.0;
+			double G = Data[i][j + 1] / 255.0;
+			double R = Data[i][j + 2] / 255.0;
+			double theta = 0;
+			double S = 0;
+			if (R == 0 && G == 0 && B == 0)
+			{
+				theta = 0;
+				S = 0;
+			}
+			else
+			{
+				theta = acos(0.5 * ((R - G) + (R - B)) / sqrt((R - G) * (R - G) + (R - B) * (G - B)));
+				S = 1 - 3 * min(R, G, B) / (R + G + B);
+			}
+			double H = B <= G ? theta : 2 * Pi - theta;
+			double I = (R + G + B) / 3;
+			result[i][j] = H * 255.0 / 2 / Pi;
+			result[i][j + 1] = S * 255;
+			result[i][j + 2] = I * 255;
+		}
+	}
+	return result;
+}
+
+Matrix<double> HSI2RGB(Matrix<double> const& Data)
+{
+	int rows = Data.size();
+	int cols = Data[0].size();
+	Matrix<double> result(rows, std::vector<double>(cols, 0.0));
+	for (int i = 0; i < rows; i++) {
+		for (int j = 0; j < cols; j += 3) {
+			double H = Data[i][j + 2] * 2 * Pi / 255.0;
+			double S = Data[i][j + 1] / 255.0;
+			double I = Data[i][j] / 255.0;
+			double R = 0;
+			double G = 0;
+			double B = 0;
+			if (H >= 0 && H < 2 * Pi / 3)
+			{
+				B = I * (1 - S);
+				R = I * (1 + S * cos(H) / cos(Pi / 3 - H));
+				G = 3 * I - R - B;
+			}
+			else if (H >= 2 * Pi / 3 && H < 4 * Pi / 3)
+			{
+				H = H - 2 * Pi / 3;
+				R = I * (1 - S);
+				G = I * (1 + S * cos(H) / cos(Pi / 3 - H));
+				B = 3 * I - R - G;
+			}
+			else
+			{
+				H = H - 4 * Pi / 3;
+				G = I * (1 - S);
+				B = I * (1 + S * cos(H) / cos(Pi / 3 - H));
+				R = 3 * I - G - B;
+			}
+			if (R > 1)
+				R = 1;
+			if (G > 1)
+				G = 1;
+			if (B > 1)
+				B = 1;
+			result[i][j] = B * 255;
+			result[i][j + 1] = G * 255;
+			result[i][j + 2] = R * 255;
+		}
+	}
+	return result;
+}
+
 Matrix<double> Transverse(ImageSet const& imageSet, int num, int newHeight, int newWidth)
 {
 	return BilinearInterpolation(Transverse(imageSet, num), newHeight, newWidth);

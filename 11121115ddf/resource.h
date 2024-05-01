@@ -94,13 +94,25 @@
 #define ID_32838                        32838
 #define ID_TEST1                        32839
 #define ID_LENAPSNR                     32840
+#define ID_32841                        32841
+#define ID_ColorRing                    32842
+#define ID_32843                        32843
+#define ID_32844                        32844
+#define ID_32845                        32845
+#define ID_Intensity                    32846
+#define ID_Saturation                   32847
+#define ID_Hue                          32848
+#define ID_32849                        32849
+#define ID_32850                        32850
+#define ID_RGB2HSI                      32851
+#define ID_HSI2RGB                      32852
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        322
-#define _APS_NEXT_COMMAND_VALUE         32841
+#define _APS_NEXT_COMMAND_VALUE         32853
 #define _APS_NEXT_CONTROL_VALUE         1015
 #define _APS_NEXT_SYMED_VALUE           310
 #endif

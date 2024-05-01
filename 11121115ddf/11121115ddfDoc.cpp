@@ -57,6 +57,12 @@ BEGIN_MESSAGE_MAP(CMy11121115ddfDoc, CDocument)
 	ON_COMMAND(ID_ThreeViews, &CMy11121115ddfDoc::OnThreeviews)
 	ON_COMMAND(ID_TEST1, &CMy11121115ddfDoc::OnTest1)
 	ON_COMMAND(ID_LENAPSNR, &CMy11121115ddfDoc::OnLenapsnr)
+	ON_COMMAND(ID_ColorRing, &CMy11121115ddfDoc::OnColorring)
+	ON_COMMAND(ID_Hue, &CMy11121115ddfDoc::OnHue)
+	ON_COMMAND(ID_Saturation, &CMy11121115ddfDoc::OnSaturation)
+	ON_COMMAND(ID_Intensity, &CMy11121115ddfDoc::OnIntensity)
+	ON_COMMAND(ID_RGB2HSI, &CMy11121115ddfDoc::OnRGB2HSI)
+	ON_COMMAND(ID_HSI2RGB, &CMy11121115ddfDoc::OnHSI2RGB)
 END_MESSAGE_MAP()
 
 
@@ -564,5 +570,79 @@ void CMy11121115ddfDoc::OnLenapsnr()
 
 		// 释放内存.
 		delete pDib;
+	}
+}
+
+
+void CMy11121115ddfDoc::OnColorring()
+{
+	// TODO: 在此添加命令处理程序代码
+	// TODO: 在此添加命令处理程序代码
+	if (m_pDib != NULL)
+	{
+		delete m_pDib;
+	}
+	m_pDib = new CDib;
+	m_pDib->CreateColorRing(512, 512);
+	if (m_pBuffer != NULL)
+	{
+		delete m_pBuffer;
+	}
+	m_pBuffer = new CDib(*m_pDib);
+	UpdateAllViews(NULL);
+}
+
+
+void CMy11121115ddfDoc::OnHue()
+{
+	// TODO: 在此添加命令处理程序代码
+	if (m_pDib != NULL)
+	{
+		m_pDib->ShowHSIChannel(CDib::HUE);
+		UpdateAllViews(NULL);
+	}
+}
+
+
+void CMy11121115ddfDoc::OnSaturation()
+{
+	// TODO: 在此添加命令处理程序代码
+	if (m_pDib != NULL)
+	{
+		m_pDib->ShowHSIChannel(CDib::SATURATION);
+		UpdateAllViews(NULL);
+	}
+}
+
+
+void CMy11121115ddfDoc::OnIntensity()
+{
+	// TODO: 在此添加命令处理程序代码
+	if (m_pDib != NULL)
+	{
+		m_pDib->ShowHSIChannel(CDib::INTENSITY);
+		UpdateAllViews(NULL);
+	}
+}
+
+
+void CMy11121115ddfDoc::OnRGB2HSI()
+{
+	// TODO: 在此添加命令处理程序代码
+	if (m_pDib != NULL)
+	{
+		m_pDib->RGB2HSI();
+		UpdateAllViews(NULL);
+	}
+}
+
+
+void CMy11121115ddfDoc::OnHSI2RGB()
+{
+	// TODO: 在此添加命令处理程序代码
+	if (m_pDib != NULL)
+	{
+		m_pDib->HSI2RGB();
+		UpdateAllViews(NULL);
 	}
 }

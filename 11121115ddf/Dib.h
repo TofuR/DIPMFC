@@ -31,6 +31,8 @@ public:
 	void LoadRawFile(LPCTSTR lpszPathName);
 	void CreateDisplayDib(uint16_t* pRawBuffer, int nWidth, int nHeight, int nBitCount);
 	void CreateWhiteRect(double = 512, double = 512, double = 100, double = 100);
+	void CreateColorRing(double = 512, double = 512);
+
 
 public:
 	void Stretching();
@@ -65,6 +67,14 @@ public:
 	Matrix<double> AdaptiveMedianFilter(int = 19);	// 均值滤波
 	Matrix<double> BilateralFilter(int diameter, double sigmaDistance, double sigmaIntensity);
 
+public:
+	// 通过RGB通道获取HSI通道
+	Matrix<double> GetHSIChannel(HSIChannel channel);
+	// 显示HSI的某一通道
+	void ShowHSIChannel(HSIChannel channel);
+	// 将HSI通道通过RGB通道显示
+	void RGB2HSI();
+	void HSI2RGB();
 
 public:
 	long* GrayValueCount();	// 获取灰度值统计

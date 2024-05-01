@@ -248,6 +248,60 @@ void CDib::CreateWhiteRect(double nWidth, double nHeight, double wWidth, double 
 	}
 }
 
+void CDib::CreateColorRing(double nWidth, double nHeight)
+{
+	Create(nWidth, nHeight, 24, 0);
+	m_nWidth = GetWidth();
+	m_nHeight = GetHeight();
+	m_nWidthBytes = abs(GetPitch());
+	m_nBitCount = GetBPP();
+	m_pDibBits = (unsigned char*)GetBits() + (m_nHeight - 1) * GetPitch();
+	// 创建蓝色圆形
+	for (int i = 0; i < m_nHeight; i++) {
+		for (int j = 0; j < m_nWidth; j++) {
+			double x = 200;
+			double y = 200;
+			double r = 80;
+			// 计算当前像素点到圆心的距禂
+			double d = sqrt((i - x) * (i - x) + (j - y) * (j - y));
+			if (d < r) {
+				*(m_pDibBits + i * m_nWidthBytes + j * 3) = 255;
+				*(m_pDibBits + i * m_nWidthBytes + j * 3 + 1) = 0;
+				*(m_pDibBits + i * m_nWidthBytes + j * 3 + 2) = 0;
+			}
+			else {
+				*(m_pDibBits + i * m_nWidthBytes + j * 3) = 0;
+				*(m_pDibBits + i * m_nWidthBytes + j * 3 + 1) = 0;
+				*(m_pDibBits + i * m_nWidthBytes + j * 3 + 2) = 0;
+			}
+
+		}
+	}
+	// 创建绿色圆形
+	for (int i = 0; i < m_nHeight; i++) {
+		for (int j = 0; j < m_nWidth; j++) {
+			double x = 200;
+			double y = 310;
+			double r = 80;
+			if (sqrt((i - x) * (i - x) + (j - y) * (j - y)) < r) {
+				*(m_pDibBits + i * m_nWidthBytes + j * 3 + 1) = 255;
+			}
+		}
+	}
+	// 创建红色圆形
+	for (int i = 0; i < m_nHeight; i++) {
+		for (int j = 0; j < m_nWidth; j++) {
+			double x = 285;
+			double y = 255;
+			double r = 80;
+			if (sqrt((i - x) * (i - x) + (j - y) * (j - y)) < r) {
+				*(m_pDibBits + i * m_nWidthBytes + j * 3 + 2) = 255;
+			}
+		}
+	}
+
+}
+
 
 // Image Processing in Spatial Domain
 
@@ -608,7 +662,77 @@ Matrix<double> CDib::BilateralFilter(int diameter, double sigmaDistance, double 
 }
 
 
+// Color Image Processing
 
+Matrix<double> CDib::GetHSIChannel(HSIChannel channel)
+{
+	Matrix<double> Data = Tovector();
+	Matrix<double> Data_HSI = ::RGB2HSI(Data);
+	Matrix<double> Data_Channel(m_nHeight, vector<double>(m_nWidth, 0));
+	if (channel == HSIChannel::HUE) {
+		for (int i = 0; i < m_nHeight; i++) {
+			for (int j = 0; j < m_nWidth; j++) {
+				Data_Channel[i][j] = Data_HSI[i][j * 3];
+			}
+		}
+	}
+	else if (channel == HSIChannel::SATURATION) {
+		for (int i = 0; i < m_nHeight; i++) {
+			for (int j = 0; j < m_nWidth; j++) {
+				Data_Channel[i][j] = Data_HSI[i][j * 3 + 1];
+			}
+		}
+	}
+	else if (channel == HSIChannel::INTENSITY) {
+		for (int i = 0; i < m_nHeight; i++) {
+			for (int j = 0; j < m_nWidth; j++) {
+				Data_Channel[i][j] = Data_HSI[i][j * 3 + 2];
+			}
+		}
+	}
+	return Data_Channel;
+}
+
+void CDib::ShowHSIChannel(HSIChannel channel)
+{
+	Matrix<double> Data_Channel = GetHSIChannel(channel);
+	// 将二维数组写入图像，每个像素的RGB为Data_Channel[i][j]
+	for (int i = 0; i < m_nHeight; i++) {
+		for (int j = 0; j < m_nWidth; j++) {
+			*(m_pDibBits + i * m_nWidthBytes + j * 3) = (unsigned char)(Data_Channel[i][j] + 0.5);
+			*(m_pDibBits + i * m_nWidthBytes + j * 3 + 1) = (unsigned char)(Data_Channel[i][j] + 0.5);
+			*(m_pDibBits + i * m_nWidthBytes + j * 3 + 2) = (unsigned char)(Data_Channel[i][j] + 0.5);
+		}
+	}
+}
+
+void CDib::RGB2HSI()
+{
+	Matrix<double> Data = Tovector();
+	Matrix<double> Data_HSI = ::RGB2HSI(Data);
+	// 将二维数组写入图像，每个像素的RGB为Data_HSI[i][j * 3], Data_HSI[i][j * 3 + 1], Data_HSI[i][j * 3 + 2]
+	for (int i = 0; i < m_nHeight; i++) {
+		for (int j = 0; j < m_nWidth; j++) {
+			*(m_pDibBits + i * m_nWidthBytes + j * 3 + 2) = (unsigned char)(Data_HSI[i][j * 3] + 0.5);
+			*(m_pDibBits + i * m_nWidthBytes + j * 3 + 1) = (unsigned char)(Data_HSI[i][j * 3 + 1] + 0.5);
+			*(m_pDibBits + i * m_nWidthBytes + j * 3) = (unsigned char)(Data_HSI[i][j * 3 + 2] + 0.5);
+		}
+	}
+}
+
+void CDib::HSI2RGB()
+{
+	Matrix<double> Data = Tovector();
+	Matrix<double> Data_RGB = ::HSI2RGB(Data);
+	// 将二维数组写入图像，每个像素的RGB为Data_RGB[i][j * 3], Data_RGB[i][j * 3 + 1], Data_RGB[i][j * 3 + 2]
+	for (int i = 0; i < m_nHeight; i++) {
+		for (int j = 0; j < m_nWidth; j++) {
+			*(m_pDibBits + i * m_nWidthBytes + j * 3) = (unsigned char)(Data_RGB[i][j * 3] + 0.5);
+			*(m_pDibBits + i * m_nWidthBytes + j * 3 + 1) = (unsigned char)(Data_RGB[i][j * 3 + 1] + 0.5);
+			*(m_pDibBits + i * m_nWidthBytes + j * 3 + 2) = (unsigned char)(Data_RGB[i][j * 3 + 2] + 0.5);
+		}
+	}
+}
 
 // some functions
 
@@ -662,14 +786,24 @@ Matrix<double> CDib::Tovector()
 	if (m_pDibBits == nullptr) {
 		return Matrix<double>();
 	}
-	Matrix<double> pDibBits2D(m_nHeight, vector<double>(m_nWidthBytes, 0));
+	Matrix<double> Data(m_nHeight, vector<double>(m_nWidthBytes, 0));
 	if (m_nBitCount == 8) {
 		for (int i = 0; i < m_nHeight; i++) {
 			for (int j = 0; j < m_nWidthBytes; j++) {
-				pDibBits2D[i][j] = *(m_pDibBits + i * m_nWidthBytes + j);
+				Data[i][j] = *(m_pDibBits + i * m_nWidthBytes + j);
 			}
 		}
-		return pDibBits2D;
+		return Data;
+	}
+	else if (m_nBitCount == 24) {
+		for (int i = 0; i < m_nHeight; i++) {
+			for (int j = 0; j < m_nWidthBytes; j += 3) {
+				Data[i][j] = *(m_pDibBits + i * m_nWidthBytes + j);
+				Data[i][j + 1] = *(m_pDibBits + i * m_nWidthBytes + j + 1);
+				Data[i][j + 2] = *(m_pDibBits + i * m_nWidthBytes + j + 2);
+			}
+		}
+		return Data;
 	}
 }
 
@@ -702,16 +836,18 @@ void CDib::Read(vector<vector<unsigned char>> const& pDibBits2D) {
 }
 
 void CDib::Read(Matrix<double> const& pDibBits2D) {
-	for (int i = 0; i < m_nHeight; i++) {
-		for (int j = 0; j < m_nWidthBytes; j++) {
-			double tmp = pDibBits2D[i][j];
-			if (tmp < 0) {
-				tmp = 0;
+	if (m_nBitCount) {
+		for (int i = 0; i < m_nHeight; i++) {
+			for (int j = 0; j < m_nWidthBytes; j++) {
+				double tmp = pDibBits2D[i][j];
+				if (tmp < 0) {
+					tmp = 0;
+				}
+				if (tmp > 255) {
+					tmp = 255;
+				}
+				*(m_pDibBits + i * m_nWidthBytes + j) = (unsigned char)(tmp + 0.5);
 			}
-			if (tmp > 255) {
-				tmp = 255;
-			}
-			*(m_pDibBits + i * m_nWidthBytes + j) = (unsigned char)(tmp + 0.5);
 		}
 	}
 }

@@ -6,6 +6,7 @@ using namespace std;
 
 #define Pi 3.1415926535897932354626
 #define Ei 2.71828
+#define min(a,b,c) (a<b?(a<c?a:c):(b<c?b:c))
 
 // 功能函数
 
@@ -62,6 +63,13 @@ Matrix<double> Transverse(ImageSet const& imageSet, int num);
 Matrix<double> Coronal(ImageSet const& imageSet, int num);
 
 Matrix<double> Sagittal(ImageSet const& imageSet, int num);
+
+// 彩色图像处理
+
+Matrix<double> RGB2HSI(Matrix<double> const& Data);
+
+Matrix<double> HSI2RGB(Matrix<double> const& Data);
+
 
 // 对ImageSet显示某一个面，规定长宽，不足则进行双线性插值
 

@@ -79,4 +79,10 @@ public:
 	afx_msg void OnThreeviews();
 	afx_msg void OnTest1();
 	afx_msg void OnLenapsnr();
+	afx_msg void OnColorring();
+	afx_msg void OnHue();
+	afx_msg void OnSaturation();
+	afx_msg void OnIntensity();
+	afx_msg void OnRGB2HSI();
+	afx_msg void OnHSI2RGB();
 };
