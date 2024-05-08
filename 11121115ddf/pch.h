@@ -8,6 +8,10 @@
 #define PCH_H
 
 // 添加要在此处预编译的标头
+#include <opencv2/core/core.hpp>           // cv::Mat
+#include <opencv2/imgcodecs/imgcodecs.hpp>     // cv::imread()
+#include <opencv2\opencv.hpp>
+
 #include "framework.h"
 
 #endif //PCH_H
