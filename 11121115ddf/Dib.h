@@ -97,7 +97,7 @@ public:
 	void IFFT_2D(complex<double>*, complex<double>*, int, int);
 	void IFFT_1D(complex<double>*, complex<double>*, int);
 
-private:
+public:
 	long m_nWidth;
 	long m_nHeight;
 	int m_nWidthBytes;

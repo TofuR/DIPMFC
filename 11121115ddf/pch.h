@@ -11,7 +11,6 @@
 #include <opencv2/core/core.hpp>           // cv::Mat
 #include <opencv2/imgcodecs/imgcodecs.hpp>     // cv::imread()
 #include <opencv2\opencv.hpp>
-
 #include "framework.h"
 
 #endif //PCH_H
