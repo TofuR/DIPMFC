@@ -115,13 +115,20 @@
 #define ID_Erosion                      32859
 #define ID_32860                        32860
 #define ID_Dilation                     32861
+#define ID_32862                        32862
+#define ID_32863                        32863
+#define ID_Edge                         32864
+#define ID_FindContours                 32865
+#define ID_OPENCV_32866                 32866
+#define ID_OPENCV_                      32867
+#define ID_OPENCV_Invert                32868
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        322
-#define _APS_NEXT_COMMAND_VALUE         32862
+#define _APS_NEXT_COMMAND_VALUE         32869
 #define _APS_NEXT_CONTROL_VALUE         1015
 #define _APS_NEXT_SYMED_VALUE           310
 #endif

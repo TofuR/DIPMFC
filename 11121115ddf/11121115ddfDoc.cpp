@@ -69,6 +69,9 @@ BEGIN_MESSAGE_MAP(CMy11121115ddfDoc, CDocument)
 	ON_COMMAND(ID_Binarization, &CMy11121115ddfDoc::OnBinarization)
 	ON_COMMAND(ID_Erosion, &CMy11121115ddfDoc::OnErosion)
 	ON_COMMAND(ID_Dilation, &CMy11121115ddfDoc::OnDilation)
+	ON_COMMAND(ID_Edge, &CMy11121115ddfDoc::OnEdge)
+	ON_COMMAND(ID_FindContours, &CMy11121115ddfDoc::OnFindcontours)
+	ON_COMMAND(ID_OPENCV_Invert, &CMy11121115ddfDoc::OnOpencvInvert)
 END_MESSAGE_MAP()
 
 
@@ -683,7 +686,9 @@ void CMy11121115ddfDoc::OnBinarization()
 	// TODO: 在此添加命令处理程序代码
 	if (m_pDib != NULL)
 	{
-		m_pDib->Binarization();
+		COpenCVProcess cvimg(m_pDib);
+		cvimg.OpenCVBinarization(218);
+		cvimg.Mat2Dib(*m_pDib);
 		UpdateAllViews(NULL);
 	}
 }
@@ -694,7 +699,9 @@ void CMy11121115ddfDoc::OnErosion()
 	// TODO: 在此添加命令处理程序代码
 	if (m_pDib != NULL)
 	{
-		m_pDib->Erosion();
+		COpenCVProcess cvimg(m_pDib);
+		cvimg.OpenCVErode();
+		cvimg.Mat2Dib(*m_pDib);
 		UpdateAllViews(NULL);
 	}
 }
@@ -705,7 +712,48 @@ void CMy11121115ddfDoc::OnDilation()
 	// TODO: 在此添加命令处理程序代码
 	if (m_pDib != NULL)
 	{
-		m_pDib->Dilation();
+		COpenCVProcess cvimg(m_pDib);
+		cvimg.OpenCVDilate();
+		cvimg.Mat2Dib(*m_pDib);
+		UpdateAllViews(NULL);
+	}
+}
+
+
+void CMy11121115ddfDoc::OnEdge()
+{
+	// TODO: 在此添加命令处理程序代码
+	if (m_pDib != NULL)
+	{
+		COpenCVProcess cvimg(m_pDib);
+		cvimg.OpenCVEdge();
+		cvimg.Mat2Dib(*m_pDib);
+		UpdateAllViews(NULL);
+	}
+}
+
+
+void CMy11121115ddfDoc::OnFindcontours()
+{
+	// TODO: 在此添加命令处理程序代码
+	if (m_pDib != NULL)
+	{
+		COpenCVProcess cvimg(m_pDib);
+		cvimg.OpenCVFindContours();
+		cvimg.Mat2Dib(*m_pDib);
+		UpdateAllViews(NULL);
+	}
+}
+
+
+void CMy11121115ddfDoc::OnOpencvInvert()
+{
+	// TODO: 在此添加命令处理程序代码
+	if (m_pDib != NULL)
+	{
+		COpenCVProcess cvimg(m_pDib);
+		cvimg.OpenCVInvert();
+		cvimg.Mat2Dib(*m_pDib);
 		UpdateAllViews(NULL);
 	}
 }

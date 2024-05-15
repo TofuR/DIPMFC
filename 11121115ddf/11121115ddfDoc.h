@@ -90,4 +90,7 @@ public:
 	afx_msg void OnBinarization();
 	afx_msg void OnErosion();
 	afx_msg void OnDilation();
+	afx_msg void OnEdge();
+	afx_msg void OnFindcontours();
+	afx_msg void OnOpencvInvert();
 };

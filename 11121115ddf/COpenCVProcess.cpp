@@ -2,6 +2,7 @@
 #include "COpenCVProcess.h"
 #include "Dib.h"
 
+
 COpenCVProcess::COpenCVProcess(CDib* pDib)
 {
 	Dib2Mat(*pDib);
@@ -19,6 +20,62 @@ void COpenCVProcess::OpenCVGaussianBlur()
 	//Mat tmp;
 	GaussianBlur(cvimg, cvimg, Size(7, 7), 0, 0, BORDER_DEFAULT);
 	//cvimg = tmp;
+}
+
+void COpenCVProcess::OpenCVBinarization(int nThreshold)
+{
+	cvtColor(cvimg, cvimg, CV_BGR2GRAY);
+	threshold(cvimg, cvimg, nThreshold, 255, CV_THRESH_BINARY);
+}
+
+void COpenCVProcess::OpenCVInvert()
+{
+	cvimg = 255 - cvimg;
+}
+
+void COpenCVProcess::OpenCVErode()
+{
+	Mat element = getStructuringElement(MORPH_RECT, Size(3, 3));
+	erode(cvimg, cvimg, element);
+}
+
+void COpenCVProcess::OpenCVDilate()
+{
+	Mat element = getStructuringElement(MORPH_RECT, Size(3, 3));
+	dilate(cvimg, cvimg, element);
+}
+
+void COpenCVProcess::OpenCVEdge()
+{
+	// 用原图像减去腐蚀图像得到边缘
+	Mat element = getStructuringElement(MORPH_RECT, Size(3, 3));
+	Mat imgErode;
+	erode(cvimg, imgErode, element);
+	cvimg = cvimg - imgErode;
+
+}
+
+void COpenCVProcess::OpenCVFindContours()
+{
+	// 将原彩色图像中提取的轮廓用绿色画出
+	Mat gray;
+	if (cvimg.channels() > 1) {
+		cvtColor(cvimg, gray, COLOR_BGR2GRAY);
+	}
+	else {
+		gray = cvimg.clone();
+	}
+
+	threshold(gray, gray, 218, 255, THRESH_BINARY);
+
+	vector<vector<Point>> contours;
+	vector<Vec4i> hierarchy;
+	findContours(gray, contours, hierarchy, RETR_TREE, CHAIN_APPROX_SIMPLE, Point(0, 0));
+	for (size_t i = 0; i < contours.size(); i++)
+	{
+		Scalar color = Scalar(0, 255, 0);
+		drawContours(cvimg, contours, (int)i, color, 2, 8, hierarchy, 0, Point());
+	}
 }
 
 void COpenCVProcess::Dib2Mat(CDib& dib)
