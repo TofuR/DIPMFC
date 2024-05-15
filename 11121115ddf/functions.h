@@ -79,3 +79,8 @@ Matrix<double> Transverse(ImageSet const& imageSet, int num, int newHeight, int 
 Matrix<double> Coronal(ImageSet const& imageSet, int num, int newHeight, int newWidth);
 
 Matrix<double> Sagittal(ImageSet const& imageSet, int num, int newHeight, int newWidth);
+
+// 形态学图像处理
+
+Matrix<double> StructuringElement(int nSize, CString type);
+

@@ -86,4 +86,8 @@ public:
 	afx_msg void OnRGB2HSI();
 	afx_msg void OnHSI2RGB();
 	afx_msg void OnColorHistoEqua();
+	afx_msg void OnOpencvGaussianblur();
+	afx_msg void OnBinarization();
+	afx_msg void OnErosion();
+	afx_msg void OnDilation();
 };

@@ -751,6 +751,120 @@ void CDib::HSIHistogramEqualization()
 	}
 }
 
+// Morphological Image Processing
+
+Matrix<double> CDib::Binarization(double threshold)
+{
+	Matrix<double> Data = Tovector();
+	Matrix<double> Data_Bin(m_nHeight, vector<double>(m_nWidthBytes, 0));
+	// 彩色图像进行二值化
+	if (m_nBitCount == 24) {
+		for (int i = 0; i < m_nHeight; i++) {
+			for (int j = 0; j < m_nWidth; j++) {
+				double aver = (Data[i][j * 3] + Data[i][j * 3 + 1] + Data[i][j * 3 + 2]) / 3;
+				if (aver > threshold) {
+					Data_Bin[i][j * 3] = Data_Bin[i][j * 3 + 1] = Data_Bin[i][j * 3 + 2] = 255;
+				}
+				else {
+					Data_Bin[i][j * 3] = Data_Bin[i][j * 3 + 1] = Data_Bin[i][j * 3 + 2] = 0;
+				}
+			}
+		}
+	}
+	Read(Data_Bin);
+	return Data_Bin;
+}
+
+Matrix<double> CDib::Erosion(int SEsize)
+{
+	Matrix<double> Data = Tovector();
+	Matrix<double> Data_Ero(m_nHeight, vector<double>(m_nWidthBytes, 0));
+	Matrix<double> SE = ::StructuringElement(SEsize, L"square");
+	// 彩色图像进行腐蚀
+	if (m_nBitCount == 24) {
+		for (int i = 0; i < m_nHeight; i++) {
+			for (int j = 0; j < m_nWidth; j++) {
+				if (Data[i][j * 3] == 0) {
+					Data_Ero[i][j * 3] = Data_Ero[i][j * 3 + 1] = Data_Ero[i][j * 3 + 2] = 0;
+				}
+				else {
+					bool flag = true;
+					for (int k = 0; k < SEsize; k++) {
+						for (int l = 0; l < SEsize; l++) {
+							if (SE[k][l] == 1) {
+								if (i + k - SEsize / 2 < 0 || i + k - SEsize / 2 >= m_nHeight || j + l - SEsize / 2 < 0 || j + l - SEsize / 2 >= m_nWidth) {
+									flag = false;
+									break;
+								}
+								if (Data[i + k - SEsize / 2][(j + l - SEsize / 2) * 3] == 0) {
+									flag = false;
+									break;
+								}
+							}
+						}
+						if (!flag) {
+							break;
+						}
+					}
+					if (flag) {
+						Data_Ero[i][j * 3] = Data_Ero[i][j * 3 + 1] = Data_Ero[i][j * 3 + 2] = 255;
+					}
+					else {
+						Data_Ero[i][j * 3] = Data_Ero[i][j * 3 + 1] = Data_Ero[i][j * 3 + 2] = 0;
+					}
+				}
+			}
+		}
+	}
+	Read(Data_Ero);
+	return Data_Ero;
+}
+
+Matrix<double> CDib::Dilation(int SEsize)
+{
+	Matrix<double> Data = Tovector();
+	Matrix<double> Data_Dil(m_nHeight, vector<double>(m_nWidthBytes, 0));
+	Matrix<double> SE = ::StructuringElement(SEsize, L"square");
+	// 彩色图像进行膨胀
+	if (m_nBitCount == 24) {
+		for (int i = 0; i < m_nHeight; i++) {
+			for (int j = 0; j < m_nWidth; j++) {
+				if (Data[i][j * 3] == 255) {
+					Data_Dil[i][j * 3] = Data_Dil[i][j * 3 + 1] = Data_Dil[i][j * 3 + 2] = 255;
+				}
+				else {
+					bool flag = false;
+					for (int k = 0; k < SEsize; k++) {
+						for (int l = 0; l < SEsize; l++) {
+							if (SE[k][l] == 1) {
+								if (i + k - SEsize / 2 < 0 || i + k - SEsize / 2 >= m_nHeight || j + l - SEsize / 2 < 0 || j + l - SEsize / 2 >= m_nWidth) {
+									flag = true;
+									break;
+								}
+								if (Data[i + k - SEsize / 2][(j + l - SEsize / 2) * 3] == 255) {
+									flag = true;
+									break;
+								}
+							}
+						}
+						if (flag) {
+							break;
+						}
+					}
+					if (flag) {
+						Data_Dil[i][j * 3] = Data_Dil[i][j * 3 + 1] = Data_Dil[i][j * 3 + 2] = 255;
+					}
+					else {
+						Data_Dil[i][j * 3] = Data_Dil[i][j * 3 + 1] = Data_Dil[i][j * 3 + 2] = 0;
+					}
+				}
+			}
+		}
+	}
+	Read(Data_Dil);
+	return Data_Dil;
+}
+
 // some functions
 
 long* CDib::GrayValueCount() {
@@ -814,10 +928,8 @@ Matrix<double> CDib::Tovector()
 	}
 	else if (m_nBitCount == 24) {
 		for (int i = 0; i < m_nHeight; i++) {
-			for (int j = 0; j < m_nWidthBytes; j += 3) {
+			for (int j = 0; j < m_nWidthBytes; j++) {
 				Data[i][j] = *(m_pDibBits + i * m_nWidthBytes + j);
-				Data[i][j + 1] = *(m_pDibBits + i * m_nWidthBytes + j + 1);
-				Data[i][j + 2] = *(m_pDibBits + i * m_nWidthBytes + j + 2);
 			}
 		}
 		return Data;

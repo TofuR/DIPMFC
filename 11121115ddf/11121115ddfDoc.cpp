@@ -23,6 +23,7 @@
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
+#include "COpenCVProcess.h"
 
 
 // CMy11121115ddfDoc
@@ -64,6 +65,10 @@ BEGIN_MESSAGE_MAP(CMy11121115ddfDoc, CDocument)
 	ON_COMMAND(ID_RGB2HSI, &CMy11121115ddfDoc::OnRGB2HSI)
 	ON_COMMAND(ID_HSI2RGB, &CMy11121115ddfDoc::OnHSI2RGB)
 	ON_COMMAND(ID_Color_Histo_Equa, &CMy11121115ddfDoc::OnColorHistoEqua)
+	ON_COMMAND(ID_OPENCV_GAUSSIANBLUR, &CMy11121115ddfDoc::OnOpencvGaussianblur)
+	ON_COMMAND(ID_Binarization, &CMy11121115ddfDoc::OnBinarization)
+	ON_COMMAND(ID_Erosion, &CMy11121115ddfDoc::OnErosion)
+	ON_COMMAND(ID_Dilation, &CMy11121115ddfDoc::OnDilation)
 END_MESSAGE_MAP()
 
 
@@ -655,6 +660,52 @@ void CMy11121115ddfDoc::OnColorHistoEqua()
 	if (m_pDib != NULL)
 	{
 		m_pDib->HSIHistogramEqualization();
+		UpdateAllViews(NULL);
+	}
+}
+
+
+void CMy11121115ddfDoc::OnOpencvGaussianblur()
+{
+	// TODO: 在此添加命令处理程序代码
+	if (m_pDib != NULL)
+	{
+		COpenCVProcess cvimg(m_pDib);
+		cvimg.OpenCVGaussianBlur();
+		cvimg.Mat2Dib(*m_pDib);
+		UpdateAllViews(NULL);
+	}
+}
+
+
+void CMy11121115ddfDoc::OnBinarization()
+{
+	// TODO: 在此添加命令处理程序代码
+	if (m_pDib != NULL)
+	{
+		m_pDib->Binarization();
+		UpdateAllViews(NULL);
+	}
+}
+
+
+void CMy11121115ddfDoc::OnErosion()
+{
+	// TODO: 在此添加命令处理程序代码
+	if (m_pDib != NULL)
+	{
+		m_pDib->Erosion();
+		UpdateAllViews(NULL);
+	}
+}
+
+
+void CMy11121115ddfDoc::OnDilation()
+{
+	// TODO: 在此添加命令处理程序代码
+	if (m_pDib != NULL)
+	{
+		m_pDib->Dilation();
 		UpdateAllViews(NULL);
 	}
 }

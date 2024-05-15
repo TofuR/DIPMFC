@@ -68,15 +68,23 @@ public:
 	Matrix<double> BilateralFilter(int diameter, double sigmaDistance, double sigmaIntensity);
 
 public:
-	// 通过RGB通道获取HSI通道
-	Matrix<double> GetHSIChannel(HSIChannel channel);
-	// 显示HSI的某一通道
-	void ShowHSIChannel(HSIChannel channel);
-	// 将HSI通道通过RGB通道显示
-	void RGB2HSI();
+	Matrix<double> GetHSIChannel(HSIChannel channel);	// 通过RGB通道获取HSI通道
+	void ShowHSIChannel(HSIChannel channel);	// 显示HSI的某一通道
+	void RGB2HSI();	// 将HSI通道通过RGB通道显示
 	void HSI2RGB();
-	// 对HSI通道进行直方图均衡化
-	void HSIHistogramEqualization();
+	void HSIHistogramEqualization();	// 对HSI通道进行直方图均衡化
+
+public:
+	// 形态学处理
+	Matrix<double> Binarization(double = 218);
+	Matrix<double> Erosion(int = 3);
+	Matrix<double> Dilation(int = 3);
+	//Matrix<double> Opening(int = 3);
+	//Matrix<double> Closing(int = 3);
+	//Matrix<double> HitOrMiss(Matrix<double> const&, Matrix<double> const&);
+	//Matrix<double> Thinning(Matrix<double> const&);
+	//Matrix<double> Thickening(Matrix<double> const&);
+	//Matrix<double> Skeleton(Matrix<double> const&);
 
 public:
 	long* GrayValueCount();	// 获取灰度值统计

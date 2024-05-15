@@ -569,6 +569,34 @@ Matrix<double> Sagittal(ImageSet const& imageSet, int num, int newHeight, int ne
 	return BilinearInterpolation(Sagittal(imageSet, num), newHeight, newWidth);
 }
 
+Matrix<double> StructuringElement(int nSize, CString type)
+{
+	Matrix<double> result(nSize, std::vector<double>(nSize, 0.0));
+	if (type == "square") {
+		for (int i = 0; i < nSize; i++) {
+			for (int j = 0; j < nSize; j++) {
+				result[i][j] = 1;
+			}
+		}
+	}
+	else if (type == "cross") {
+		for (int i = 0; i < nSize; i++) {
+			result[nSize / 2][i] = 1;
+			result[i][nSize / 2] = 1;
+		}
+	}
+	else if (type == "circle") {
+		int nCenter = nSize / 2;
+		for (int i = 0; i < nSize; i++) {
+			for (int j = 0; j < nSize; j++) {
+				if (pow(i - nCenter, 2) + pow(j - nCenter, 2) <= pow(nCenter, 2)) {
+					result[i][j] = 1;
+				}
+			}
+		}
+	}
+	return result;
+}
 
 
 
