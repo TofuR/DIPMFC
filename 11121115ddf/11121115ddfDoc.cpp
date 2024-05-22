@@ -333,7 +333,7 @@ void CMy11121115ddfDoc::OnGaussian1D()
 	{
 		DWORD t1, t2;
 		t1 = GetTickCount64();
-		m_pDib->Gaussian1D(7);
+		m_pDib->Gaussian1D(19);
 		UpdateAllViews(NULL);
 		t2 = GetTickCount64();
 		CString str;
