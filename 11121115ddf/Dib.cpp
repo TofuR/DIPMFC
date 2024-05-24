@@ -400,8 +400,11 @@ void CDib::Sobel() {
 		vector<double>(m_nWidthBytes, 0));
 	for (int i = 0; i < m_nHeight; i++) {
 		for (int j = 0; j < m_nWidthBytes; j++) {
+			// 计算梯度幅值
 			pDibBits2D[i][j] = sqrt(pDibBits2D_X[i][j] * pDibBits2D_X[i][j] +
 				pDibBits2D_Y[i][j] * pDibBits2D_Y[i][j]);
+			// 计算梯度角度
+			//pDibBits2D[i][j] = atan2(pDibBits2D_Y[i][j], pDibBits2D_X[i][j]);
 		}
 	}
 	Read(pDibBits2D);
@@ -866,6 +869,55 @@ Matrix<double> CDib::Dilation(int SEsize)
 }
 
 // some functions
+
+Matrix<double> CDib::Canny_Gaussian(double sigma)
+{
+	Matrix<double> pDibBits2D = Tovector();
+	Matrix<double> pDibBits2D_Gaussian = ::GaussianBlur(pDibBits2D, sigma);
+	Read(pDibBits2D_Gaussian);
+	return pDibBits2D_Gaussian;
+}
+
+Matrix<double> CDib::Canny_Sobel(int nSize)
+{
+	Matrix<double> pDibBits2D = Tovector();
+	// 创建Amplitude和Angle矩阵
+	Matrix<double> Amplitude(m_nHeight, vector<double>(m_nWidthBytes, 0));
+	Matrix<double> Angle(m_nHeight, vector<double>(m_nWidthBytes, 0));
+	::SobelOperator(pDibBits2D, nSize, Amplitude, Angle);
+	Matrix<double> pDibBits2D_Sobel = Amplitude;
+
+	Read(pDibBits2D_Sobel);
+	return pDibBits2D_Sobel;
+}
+
+Matrix<double> CDib::Canny_NMS()
+{
+	Matrix<double> pDibBits2D = Tovector();
+	Matrix<double> Amplitude(m_nHeight, vector<double>(m_nWidthBytes, 0));
+	Matrix<double> Angle(m_nHeight, vector<double>(m_nWidthBytes, 0));
+	::SobelOperator(pDibBits2D, 3, Amplitude, Angle);
+	Matrix<double> NMS = ::NonMaximumSuppression(Amplitude, Angle);
+	Read(NMS);
+	return NMS;
+}
+
+Matrix<double> CDib::Canny_DoubleThreshold(double low, double high)
+{
+	Matrix<double> pDibBits2D = Tovector();
+	Matrix<double> Amplitude(m_nHeight, vector<double>(m_nWidthBytes, 0));
+	Matrix<double> Angle(m_nHeight, vector<double>(m_nWidthBytes, 0));
+	::SobelOperator(pDibBits2D, 3, Amplitude, Angle);
+	Matrix<double> NMS = ::NonMaximumSuppression(Amplitude, Angle);
+	// 找到NMS的最大值
+	//double max = findmax(NMS);
+	double max = 255;
+	Matrix<double> DT = ::DoubleThreshold(NMS, 0.1 * max, 0.2 * max);
+	Matrix<double> ET = ::EdgeTracking(DT);
+	Read(ET);
+	return ET;
+
+}
 
 long* CDib::GrayValueCount() {
 	long nColors = GetMaxColorTableEntries();

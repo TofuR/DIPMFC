@@ -122,13 +122,24 @@
 #define ID_OPENCV_32866                 32866
 #define ID_OPENCV_                      32867
 #define ID_OPENCV_Invert                32868
+#define ID_CANNY_32869                  32869
+#define ID_CANNY_                       32870
+#define ID_CANNY_GAUSSIAN               32871
+#define ID_CANNY_32872                  32872
+#define ID_CANNY_SOBEL                  32873
+#define ID_CANNY_32874                  32874
+#define ID_CANNY_NMS                    32875
+#define ID_CANNY_32876                  32876
+#define ID_CANNY_DOUBLE                 32877
+#define ID_CANNY_DOUBLETHRE             32878
+#define ID_CANNY_CANNY                  32879
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        322
-#define _APS_NEXT_COMMAND_VALUE         32869
+#define _APS_NEXT_COMMAND_VALUE         32880
 #define _APS_NEXT_CONTROL_VALUE         1015
 #define _APS_NEXT_SYMED_VALUE           310
 #endif

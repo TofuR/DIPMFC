@@ -72,6 +72,10 @@ BEGIN_MESSAGE_MAP(CMy11121115ddfDoc, CDocument)
 	ON_COMMAND(ID_Edge, &CMy11121115ddfDoc::OnEdge)
 	ON_COMMAND(ID_FindContours, &CMy11121115ddfDoc::OnFindcontours)
 	ON_COMMAND(ID_OPENCV_Invert, &CMy11121115ddfDoc::OnOpencvInvert)
+	ON_COMMAND(ID_CANNY_GAUSSIAN, &CMy11121115ddfDoc::OnCannyGaussian)
+	ON_COMMAND(ID_CANNY_SOBEL, &CMy11121115ddfDoc::OnCannySobel)
+	ON_COMMAND(ID_CANNY_NMS, &CMy11121115ddfDoc::OnCannyNms)
+	ON_COMMAND(ID_CANNY_DOUBLETHRE, &CMy11121115ddfDoc::OnCannyDoublethre)
 END_MESSAGE_MAP()
 
 
@@ -754,6 +758,50 @@ void CMy11121115ddfDoc::OnOpencvInvert()
 		COpenCVProcess cvimg(m_pDib);
 		cvimg.OpenCVInvert();
 		cvimg.Mat2Dib(*m_pDib);
+		UpdateAllViews(NULL);
+	}
+}
+
+
+void CMy11121115ddfDoc::OnCannyGaussian()
+{
+	// TODO: 在此添加命令处理程序代码
+	if (m_pDib != NULL)
+	{
+		m_pDib->Canny_Gaussian(3);
+		UpdateAllViews(NULL);
+	}
+}
+
+
+void CMy11121115ddfDoc::OnCannySobel()
+{
+	// TODO: 在此添加命令处理程序代码
+	if (m_pDib != NULL)
+	{
+		m_pDib->Canny_Sobel();
+		UpdateAllViews(NULL);
+	}
+}
+
+
+void CMy11121115ddfDoc::OnCannyNms()
+{
+	// TODO: 在此添加命令处理程序代码
+	if (m_pDib != NULL)
+	{
+		m_pDib->Canny_NMS();
+		UpdateAllViews(NULL);
+	}
+}
+
+
+void CMy11121115ddfDoc::OnCannyDoublethre()
+{
+	// TODO: 在此添加命令处理程序代码
+	if (m_pDib != NULL)
+	{
+		m_pDib->Canny_DoubleThreshold();
 		UpdateAllViews(NULL);
 	}
 }

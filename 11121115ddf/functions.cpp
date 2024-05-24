@@ -64,6 +64,32 @@ Matrix<double> ZeroPadding(Matrix<double> const& Data, int a, int b)
 	return result;
 }
 
+Matrix<double> Con2d(Matrix<double> const& mat, Matrix<double> const& kernel, int padding)
+{
+	// 含有padding的卷积
+	int rows = mat.size();
+	int cols = mat[0].size();
+	int kernelRows = kernel.size();
+	int kernelCols = kernel[0].size();
+	// 补零
+	Matrix<double> paddedMat = ZeroPadding(mat, padding, padding);
+	// 创建一个新的图片矩阵，用于存储卷积后的结果
+	Matrix<double> result(rows, vector<double>(cols, 0.0));
+	// 对原始图片的每个像素进行卷积
+	for (int i = 0; i < rows; i++) {
+		for (int j = 0; j < cols; j++) {
+			double sum = 0;
+			for (int m = 0; m < kernelRows; m++) {
+				for (int n = 0; n < kernelCols; n++) {
+					sum += paddedMat[i + m][j + n] * kernel[m][n];
+				}
+			}
+			result[i][j] = sum;
+		}
+	}
+	return result;
+}
+
 Matrix<double> BilinearInterpolation(Matrix<double> const& matrix, int newHeight, int newWidth)
 {
 	int oldHeight = matrix.size();
@@ -598,7 +624,143 @@ Matrix<double> StructuringElement(int nSize, CString type)
 	return result;
 }
 
+Matrix<double> GaussianKernel(double sigma)
+{
+	int nSize = 2 * ceil(3 * sigma) + 1;
+	Matrix<double> result(nSize, std::vector<double>(nSize, 0.0));
+	double sum = 0;
+	for (int i = 0; i < nSize; i++) {
+		for (int j = 0; j < nSize; j++) {
+			result[i][j] = exp(-(pow(i - nSize / 2, 2) + pow(j - nSize / 2, 2)) / (2 * pow(sigma, 2)));
+			sum += result[i][j];
+		}
+	}
+	for (int i = 0; i < nSize; i++) {
+		for (int j = 0; j < nSize; j++) {
+			result[i][j] /= sum;
+		}
+	}
+	return result;
+}
 
+Matrix<double> GaussianBlur(Matrix<double> const& Data, double sigma)
+{
+	Matrix<double> kernel = GaussianKernel(sigma);
+	return Con2d(Data, kernel, kernel.size() / 2);
+}
+
+void SobelOperator(Matrix<double> const& Data, int nSize, Matrix<double>& Amplitude, Matrix<double>& Angle)
+{
+	Matrix<double> kernelX = { {1, 0, -1}, {2, 0, -2}, {1, 0, -1} };
+	Matrix<double> kernelY = { {1, 2, 1}, {0, 0, 0}, {-1, -2, -1} };
+	Matrix<double> Gx = Con2d(Data, kernelX, nSize / 2);
+	Matrix<double> Gy = Con2d(Data, kernelY, nSize / 2);
+	int rows = Data.size();
+	int cols = Data[0].size();
+	Amplitude = Matrix<double>(rows, std::vector<double>(cols, 0.0));
+	Angle = Matrix<double>(rows, std::vector<double>(cols, 0.0));
+	for (int i = 0; i < rows; i++) {
+		for (int j = 0; j < cols; j++) {
+			Amplitude[i][j] = sqrt(pow(Gx[i][j], 2) + pow(Gy[i][j], 2));
+			Angle[i][j] = atan2(Gy[i][j], Gx[i][j]);
+		}
+	}
+}
+
+Matrix<double> NonMaximumSuppression(Matrix<double> const& Amplitude, Matrix<double> const& Angle)
+{
+	int rows = Amplitude.size();
+	int cols = Amplitude[0].size();
+	Matrix<double> result(rows, std::vector<double>(cols, 0.0));
+	for (int i = 1; i < rows - 1; i++) {
+		for (int j = 1; j < cols - 1; j++) {
+			double angle = Angle[i][j];
+			double value = Amplitude[i][j];
+			if ((angle >= -Pi / 8 && angle < Pi / 8) || (angle >= 7 * Pi / 8 && angle < -7 * Pi / 8)) {
+				if (value > Amplitude[i][j - 1] && value > Amplitude[i][j + 1]) {
+					result[i][j] = value;
+				}
+			}
+			else if ((angle >= Pi / 8 && angle < 3 * Pi / 8) || (angle >= -7 * Pi / 8 && angle < -5 * Pi / 8)) {
+				if (value > Amplitude[i - 1][j + 1] && value > Amplitude[i + 1][j - 1]) {
+					result[i][j] = value;
+				}
+			}
+			else if ((angle >= 3 * Pi / 8 && angle < 5 * Pi / 8) || (angle >= -5 * Pi / 8 && angle < -3 * Pi / 8)) {
+				if (value > Amplitude[i - 1][j] && value > Amplitude[i + 1][j]) {
+					result[i][j] = value;
+				}
+			}
+			else {
+				if (value > Amplitude[i - 1][j - 1] && value > Amplitude[i + 1][j + 1]) {
+					result[i][j] = value;
+				}
+			}
+		}
+	}
+	return result;
+}
+
+Matrix<double> DoubleThreshold(Matrix<double> const& NMS, double lowThreshold, double highThreshold) {
+	int rows = NMS.size();
+	int cols = NMS[0].size();
+	Matrix<double> result(rows, std::vector<double>(cols, 0.0));
+
+	for (int i = 0; i < rows; i++) {
+		for (int j = 0; j < cols; j++) {
+			if (NMS[i][j] >= highThreshold) {
+				result[i][j] = 255;
+			}
+			else if (NMS[i][j] >= lowThreshold) {
+				result[i][j] = 128;
+			}
+			else {
+				result[i][j] = 0;
+			}
+		}
+	}
+
+	return result;
+}
+
+Matrix<double> EdgeTracking(Matrix<double> const& DT)
+{
+	int rows = DT.size();
+	int cols = DT[0].size();
+	Matrix<double> result(rows, std::vector<double>(cols, 0.0));
+	for (int i = 1; i < rows - 1; i++) {
+		for (int j = 1; j < cols - 1; j++) {
+			if (DT[i][j] == 128) {
+				if (DT[i - 1][j - 1] == 255 || DT[i - 1][j] == 255 || DT[i - 1][j + 1] == 255 ||
+					DT[i][j - 1] == 255 || DT[i][j + 1] == 255 || DT[i + 1][j - 1] == 255 ||
+					DT[i + 1][j] == 255 || DT[i + 1][j + 1] == 255) {
+					result[i][j] = 255;
+				}
+			}
+		}
+	}
+	return result;
+}
+
+Matrix<double> Canny(Matrix<double> const& Data, double sigma, double lowThreshold, double highThreshold) {
+	// Step 1: Gaussian Blur
+	Matrix<double> blurred = GaussianBlur(Data, sigma);
+
+	// Step 2: Sobel Operator
+	Matrix<double> Amplitude, Angle;
+	SobelOperator(blurred, 3, Amplitude, Angle);
+
+	// Step 3: Non-Maximum Suppression
+	Matrix<double> nms = NonMaximumSuppression(Amplitude, Angle);
+
+	// Step 4: Double Threshold
+	Matrix<double> dt = DoubleThreshold(nms, lowThreshold, highThreshold);
+
+	// Step 5: Edge Tracking by Hysteresis
+	EdgeTracking(dt);
+
+	return dt;
+}
 
 
 

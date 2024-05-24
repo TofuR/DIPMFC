@@ -93,4 +93,8 @@ public:
 	afx_msg void OnEdge();
 	afx_msg void OnFindcontours();
 	afx_msg void OnOpencvInvert();
+	afx_msg void OnCannyGaussian();
+	afx_msg void OnCannySobel();
+	afx_msg void OnCannyNms();
+	afx_msg void OnCannyDoublethre();
 };

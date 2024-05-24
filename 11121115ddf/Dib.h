@@ -87,6 +87,19 @@ public:
 	//Matrix<double> Skeleton(Matrix<double> const&);
 
 public:
+	// Canny边缘检测
+	// GaussianBlur
+	Matrix<double> Canny_Gaussian(double = 3.0);
+	// SobelOperator
+	Matrix<double> Canny_Sobel(int = 3);
+	// NonMaximumSuppression
+	Matrix<double> Canny_NMS();
+	// DoubleThresholding and EdgeTracking
+	Matrix<double> Canny_DoubleThreshold(double = 0.1, double = 0.2);
+
+	//Matrix<double> Canny(double = 3.0, int = 3, double = 0.1, double = 0.2);
+
+public:
 	long* GrayValueCount();	// 获取灰度值统计
 	//unsigned char* Padding(int, int);
 	Matrix<double> Padding(int, int);	// 填充

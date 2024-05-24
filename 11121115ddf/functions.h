@@ -20,6 +20,8 @@ uint16_t* Matrix2Uint16(Matrix<double> const&);
 
 Matrix<double> ZeroPadding(Matrix<double> const&, int, int);
 
+Matrix<double> Con2d(Matrix<double> const&, Matrix<double> const&, int padding);
+
 // 双线性插值
 
 Matrix<double> BilinearInterpolation(Matrix<double> const&, int newWidth, int newHeight);
@@ -84,3 +86,19 @@ Matrix<double> Sagittal(ImageSet const& imageSet, int num, int newHeight, int ne
 
 Matrix<double> StructuringElement(int nSize, CString type);
 
+
+// CANNY边缘检测
+
+Matrix<double> GaussianKernel(double sigma);// 产生高斯核
+
+Matrix<double> GaussianBlur(Matrix<double> const& Data, double sigma);// 高斯滤波
+
+void SobelOperator(Matrix<double> const& Data, int nSize, Matrix<double>& Amplitude, Matrix<double>& Angle);// Sobel算子返回梯度和方向
+
+Matrix<double> NonMaximumSuppression(Matrix<double> const& Amplitude, Matrix<double> const& Angle);// 非极大值抑制
+
+Matrix<double> DoubleThreshold(Matrix<double> const& Data, double lowThreshold, double highThreshold);// 双阈值处理
+
+Matrix<double> EdgeTracking(Matrix<double> const& DT);// 边缘跟踪
+
+Matrix<double> Canny(Matrix<double> const& Data, double sigma, double lowThreshold, double highThreshold);// Canny边缘检测
